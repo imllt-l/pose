@@ -2,7 +2,7 @@
 import argparse
 import os
 import os.path as osp
-
+from mmengine.hub import get_config
 from mmengine.config import Config, DictAction
 from mmengine.runner import Runner
 
@@ -142,7 +142,7 @@ def main():
 
     # load config
     cfg = Config.fromfile(args.config)
-    #cfg.default_scope = 'mmpose'
+    cfg.default_scope = 'mmpose'
     # merge CLI arguments to config
     cfg = merge_args(cfg, args)
 
