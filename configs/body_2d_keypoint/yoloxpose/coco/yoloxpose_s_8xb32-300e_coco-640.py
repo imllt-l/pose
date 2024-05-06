@@ -226,7 +226,7 @@ train_dataloader = dict(
         data_root='/kaggle/input/cow-pose-coco/Cow',
         # 标注文件路径为 {data_root}/{ann_file}
         # 例如： aaa/annotations/xxx.json
-        ann_file='file-Train.json',
+        ann_file='train/file-Train.json',
         # 图片路径为 {data_root}/{img}/
         # 例如： aaa/train/c.jpg
         data_prefix=dict(img='train'),
@@ -244,7 +244,7 @@ val_dataloader = dict(
         type='CocoDataset',
         data_root='/kaggle/input/cow-pose-coco/Cow',
         data_mode=data_mode,
-        ann_file='file.json',
+        ann_file='val/file.json',
         data_prefix=dict(img='val'),
         test_mode=True,
         metainfo=dict(from_file='configs/_base_/datasets/cow-pose.py'),
