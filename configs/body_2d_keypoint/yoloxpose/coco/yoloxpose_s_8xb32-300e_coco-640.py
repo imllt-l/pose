@@ -135,7 +135,7 @@ model = dict(
     test_cfg=dict(
         score_thr=0.01,
         nms_thr=0.65,
-    ))
+    )
 )
 # data
 input_size = (640, 640)
