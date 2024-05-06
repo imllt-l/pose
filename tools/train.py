@@ -142,7 +142,7 @@ def main():
 
     # load config
     cfg = Config.fromfile(args.config)
-
+    #cfg.default_scope = 'mmpose'
     # merge CLI arguments to config
     cfg = merge_args(cfg, args)
 

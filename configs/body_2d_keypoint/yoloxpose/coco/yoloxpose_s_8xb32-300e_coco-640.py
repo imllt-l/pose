@@ -8,7 +8,7 @@ train_cfg = dict(
     val_interval=10,
     dynamic_intervals=[(280, 1)])
 
-auto_scale_lr = dict(base_batch_size=256)
+auto_scale_lr = dict(base_batch_size=2)
 
 default_hooks = dict(
     checkpoint=dict(type='CheckpointHook', interval=10, max_keep_ckpts=3))
@@ -74,13 +74,13 @@ model = dict(
         spp_kernal_sizes=(5, 9, 13),
         norm_cfg=dict(type='BN', momentum=0.03, eps=0.001),
         act_cfg=dict(type='Swish'),
-        init_cfg=dict(
-            type='Pretrained',
-            checkpoint='https://download.openmmlab.com/mmdetection/v2.0/'
-            'yolox/yolox_s_8x8_300e_coco/yolox_s_8x8_300e_coco_'
-            '20211121_095711-4592a793.pth',
-            prefix='backbone.',
-        )),
+        # init_cfg=dict(
+        #     type='Pretrained',
+        #     checkpoint='https://download.openmmlab.com/mmdetection/v2.0/'
+        #     'yolox/yolox_s_8x8_300e_coco/yolox_s_8x8_300e_coco_'
+        #     '20211121_095711-4592a793.pth',
+        #     prefix='backbone.',
+        # )),
     neck=dict(
         type='YOLOXPAFPN',
         in_channels=[128, 256, 512],
@@ -135,11 +135,12 @@ model = dict(
         score_thr=0.01,
         nms_thr=0.65,
     ))
-
+)
 # data
 input_size = (640, 640)
 codec = dict(type='YOLOXPoseAnnotationProcessor', input_size=input_size)
 
+## 数据处理
 train_pipeline_stage1 = [
     dict(type='LoadImage', backend_args=None),
     dict(
@@ -194,23 +195,15 @@ train_pipeline_stage2 = [
 data_mode = 'bottomup'
 data_root = 'data/'
 
-dataset_coco = dict(
-    type='CocoDataset',
-    data_root=data_root,
-    data_mode=data_mode,
-    filter_cfg=dict(filter_empty_gt=False, min_size=32),
-    ann_file='coco/annotations/person_keypoints_train2017.json',
-    data_prefix=dict(img='coco/train2017/'),
-    pipeline=train_pipeline_stage1,
-)
-
-train_dataloader = dict(
-    batch_size=32,
-    num_workers=8,
-    persistent_workers=True,
-    pin_memory=True,
-    sampler=dict(type='DefaultSampler', shuffle=True),
-    dataset=dataset_coco)
+# dataset_coco = dict(
+#     type='CocoDataset',
+#     data_root=data_root,
+#     data_mode=data_mode,
+#     filter_cfg=dict(filter_empty_gt=False, min_size=32),
+#     ann_file='coco/annotations/person_keypoints_train2017.json',
+#     data_prefix=dict(img='coco/train2017/'),
+#     pipeline=train_pipeline_stage1,
+# )
 
 val_pipeline = [
     dict(type='LoadImage'),
@@ -222,22 +215,66 @@ val_pipeline = [
                    'input_size', 'input_center', 'input_scale'))
 ]
 
+
+train_dataloader = dict(
+    batch_size=16,
+    num_workers=2,
+    persistent_workers=True,
+    sampler=dict(type='DefaultSampler', shuffle=True),
+    dataset = dict(type='CocoDataset',
+        data_root='/Users/apple/Desktop/mmpose/dataset/Cow',
+        # 标注文件路径为 {data_root}/{ann_file}
+        # 例如： aaa/annotations/xxx.json
+        ann_file='file-Train.json',
+        # 图片路径为 {data_root}/{img}/
+        # 例如： aaa/train/c.jpg
+        data_prefix=dict(img='train'),
+        # 指定元信息配置文件
+        metainfo=dict(from_file='configs/_base_/datasets/cow-pose.py'),
+        pipeline=train_pipeline_stage1)
+)
 val_dataloader = dict(
     batch_size=1,
     num_workers=2,
     persistent_workers=True,
-    pin_memory=True,
     drop_last=False,
     sampler=dict(type='DefaultSampler', shuffle=False, round_up=False),
     dataset=dict(
         type='CocoDataset',
-        data_root=data_root,
+        data_root='/Users/apple/Desktop/mmpose/dataset/Cow',
         data_mode=data_mode,
-        ann_file='coco/annotations/person_keypoints_val2017.json',
-        data_prefix=dict(img='coco/val2017/'),
+        ann_file='file.json',
+        data_prefix=dict(img='val'),
         test_mode=True,
+        metainfo=dict(from_file='configs/_base_/datasets/cow-pose.py'),
         pipeline=val_pipeline,
     ))
+
+# train_dataloader = dict(
+#     batch_size=32,
+#     num_workers=8,
+#     persistent_workers=True,
+#     pin_memory=True,
+#     sampler=dict(type='DefaultSampler', shuffle=True),
+#     dataset=dataset_coco)
+
+
+# val_dataloader = dict(
+#     batch_size=1,
+#     num_workers=2,
+#     persistent_workers=True,
+#     pin_memory=True,
+#     drop_last=False,
+#     sampler=dict(type='DefaultSampler', shuffle=False, round_up=False),
+#     dataset=dict(
+#         type='CocoDataset',
+#         data_root=data_root,
+#         data_mode=data_mode,
+#         ann_file='coco/annotations/person_keypoints_val2017.json',
+#         data_prefix=dict(img='coco/val2017/'),
+#         test_mode=True,
+#         pipeline=val_pipeline,
+#     ))
 test_dataloader = val_dataloader
 
 # evaluators
