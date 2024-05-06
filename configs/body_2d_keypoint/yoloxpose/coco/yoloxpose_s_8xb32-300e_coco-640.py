@@ -281,7 +281,7 @@ test_dataloader = val_dataloader
 # evaluators
 val_evaluator = dict(
     type='CocoMetric',
-    ann_file=data_root + 'val/file.json',
+    ann_file='/kaggle/input/cow-pose-coco/Cow/val/file.json',
     score_mode='bbox',
     nms_mode='none',
 )
