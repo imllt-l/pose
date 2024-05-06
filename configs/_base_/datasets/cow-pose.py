@@ -59,7 +59,7 @@ dataset_info = dict(
             swap='Right_FK'), 
         8:
         dict(
-            name='Lift_FH',
+            name='Left_FH',
             id=8,
             color=[93, 223, 221],
             type='lower',
