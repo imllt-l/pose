@@ -154,8 +154,6 @@ dataset_info = dict(
         dict(link=('Left_HTR','Left_HH'), id=14, color=[0, 255, 0]),
         15:
         dict(link=('Left_HK'), id=15, color=[0, 255, 0]),
-        16:
-        dict(link=(''), id=16, color=[0, 255, 0]),
     },
     joint_weights=[
         1., 1., 1., 1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1., 1.5, 1.2, 1.2, 1.2, 1.2, 1.2,
