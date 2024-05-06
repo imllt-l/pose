@@ -223,7 +223,7 @@ train_dataloader = dict(
     persistent_workers=True,
     sampler=dict(type='DefaultSampler', shuffle=True),
     dataset = dict(type='CocoDataset',
-        data_root='/Kaggle/input/Cow',
+        data_root='/kaggle/input/cow-pose-coco/Cow',
         # 标注文件路径为 {data_root}/{ann_file}
         # 例如： aaa/annotations/xxx.json
         ann_file='file-Train.json',
@@ -242,7 +242,7 @@ val_dataloader = dict(
     sampler=dict(type='DefaultSampler', shuffle=False, round_up=False),
     dataset=dict(
         type='CocoDataset',
-        data_root='/Kaggle/input/Cow',
+        data_root='/kaggle/input/cow-pose-coco/Cow',
         data_mode=data_mode,
         ann_file='file.json',
         data_prefix=dict(img='val'),
