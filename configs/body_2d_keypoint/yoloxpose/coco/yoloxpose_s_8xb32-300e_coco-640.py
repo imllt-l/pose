@@ -194,7 +194,7 @@ train_pipeline_stage2 = [
 ]
 
 data_mode = 'bottomup'
-data_root = 'data/'
+# data_root = 'data/'
 
 # dataset_coco = dict(
 #     type='CocoDataset',
