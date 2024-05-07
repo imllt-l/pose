@@ -144,11 +144,11 @@ codec = dict(type='YOLOXPoseAnnotationProcessor', input_size=input_size)
 ## 数据处理
 train_pipeline_stage1 = [
     dict(type='LoadImage', backend_args=None),
-    dict(
-        type='Mosaic',
-        img_scale=(640, 640),
-        pad_val=114.0,
-        pre_transform=[dict(type='LoadImage', backend_args=None)]),
+    # dict(
+    #     type='Mosaic',
+    #     img_scale=(640, 640),
+    #     pad_val=114.0,
+    #     pre_transform=[dict(type='LoadImage', backend_args=None)]),
     dict(
         type='BottomupRandomAffine',
         input_size=(640, 640),

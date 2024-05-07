@@ -256,7 +256,8 @@ class Mosaic(MixImageTransform):
 
             if 'area' in data:
                 annos['area'].append(data['area'] * scale_ratio**2)
-
+        
+        print(annos['area'])
         for key in annos:
             annos[key] = np.concatenate(annos[key])
         return mosaic_img, annos
@@ -470,7 +471,7 @@ class YOLOXMixUp(MixImageTransform):
             results['bbox_score'], aux_results['bbox_score']
         ]
         annos['category_id'] = [
-            results['category_id'], aux_results['category_id']
+            np.float32(results['category_id']), np.float32(aux_results['category_id'])
         ]
 
         # keypoints
@@ -485,12 +486,12 @@ class YOLOXMixUp(MixImageTransform):
         kpts[..., 1] -= dy
         annos['keypoints'] = [results['keypoints'], kpts]
         annos['keypoints_visible'] = [results['keypoints_visible'], kpts_vis]
-        annos['area'] = [results['area'], aux_results['area'] * scale_ratio**2]
-
+        #annos['area'] = [results['area'], aux_results['area'] * scale_ratio**2]
+        annos['area'] = [np.float32(results['area']), np.float32(aux_results['area']) * np.float32(scale_ratio)**2]  
+        
+        #print(annos.items())
         for key in annos:
-            print(key)
-            annos[key] = np.concatenate(annos[key])
-
+            annos[key] = np.concatenate([np.atleast_1d(item).astype(np.float32) for item in annos[key]])
         return mixup_img, annos
 
     def __repr__(self) -> str:
