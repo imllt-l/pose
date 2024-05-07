@@ -229,7 +229,7 @@ train_dataloader = dict(
         ann_file='train/file-Train.json',
         # 图片路径为 {data_root}/{img}/
         # 例如： aaa/train/c.jpg
-        data_prefix=dict(img='train'),
+        data_prefix=dict(img='train/img'),
         # 指定元信息配置文件
         metainfo=dict(from_file='configs/_base_/datasets/cow-pose.py'),
         pipeline=train_pipeline_stage1)
@@ -245,7 +245,7 @@ val_dataloader = dict(
         data_root='/kaggle/input/cow-pose-coco/Cow',
         data_mode=data_mode,
         ann_file='val/file.json',
-        data_prefix=dict(img='val'),
+        data_prefix=dict(img='val/img'),
         test_mode=True,
         metainfo=dict(from_file='configs/_base_/datasets/cow-pose.py'),
         pipeline=val_pipeline,
