@@ -8,7 +8,7 @@ train_cfg = dict(
     val_interval=10,
     dynamic_intervals=[(280, 1)])
 
-auto_scale_lr = dict(base_batch_size=2)
+auto_scale_lr = dict(base_batch_size=16)
 
 default_hooks = dict(
     checkpoint=dict(type='CheckpointHook', interval=10, max_keep_ckpts=3))
