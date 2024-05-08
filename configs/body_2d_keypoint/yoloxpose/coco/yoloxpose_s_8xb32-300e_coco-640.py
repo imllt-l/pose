@@ -122,7 +122,7 @@ model = dict(
         loss_oks=dict(
             type='OKSLoss',
             reduction='none',
-            metainfo='configs/_base_/datasets/cow-pose.py',
+            metainfo='configs/_base_/datasets/cowpose.py',
             norm_target_weight=True,
             loss_weight=30.0),
         loss_vis=dict(
@@ -231,7 +231,7 @@ train_dataloader = dict(
         data_mode=data_mode,
         data_prefix=dict(img='train/img'),
         # 指定元信息配置文件
-        metainfo=dict(from_file='configs/_base_/datasets/cow-pose.py'),
+        metainfo=dict(from_file='configs/_base_/datasets/cowpose.py'),
         pipeline=train_pipeline_stage1)
 )
 val_dataloader = dict(
@@ -247,7 +247,7 @@ val_dataloader = dict(
         ann_file='val/file.json',
         data_prefix=dict(img='val/img'),
         test_mode=True,
-        metainfo=dict(from_file='configs/_base_/datasets/cow-pose.py'),
+        metainfo=dict(from_file='configs/_base_/datasets/cowpose.py'),
         pipeline=val_pipeline,
     ))
 
