@@ -194,7 +194,7 @@ train_pipeline_stage2 = [
 ]
 data_root = '/kaggle/input/cow-pose-coco/Cow/'
 data_mode = 'bottomup'
-dataset_type = 'CowPose'
+dataset_type = 'CowposeDataset'
 # data_root = 'data/'
 
 # dataset_coco = dict(
