@@ -543,7 +543,7 @@ class CocoMetric(BaseMetric):
                 result.append(res)
 
             cat_results.extend(result)
-            print(cat_results)
+            #print(cat_results)
         res_file = f'{outfile_prefix}.keypoints.json'
         dump(cat_results, res_file, sort_keys=True, indent=4)
 

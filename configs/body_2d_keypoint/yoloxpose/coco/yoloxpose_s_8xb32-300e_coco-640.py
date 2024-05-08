@@ -194,6 +194,7 @@ train_pipeline_stage2 = [
 ]
 data_root = '/kaggle/input/cow-pose-coco/Cow/'
 data_mode = 'bottomup'
+dataset_type = 'CowPose'
 # data_root = 'data/'
 
 # dataset_coco = dict(
@@ -223,7 +224,8 @@ train_dataloader = dict(
     num_workers=2,
     persistent_workers=True,
     sampler=dict(type='DefaultSampler', shuffle=True),
-    dataset = dict(type='CocoDataset',
+    dataset = dict(
+        type=dataset_type,
         data_root=data_root,
         # 标注文件路径为 {data_root}/{ann_file}
         # 例如： aaa/annotations/xxx.json
@@ -235,13 +237,13 @@ train_dataloader = dict(
         pipeline=train_pipeline_stage1)
 )
 val_dataloader = dict(
-    batch_size=1,
+    batch_size=16,
     num_workers=2,
     persistent_workers=True,
     drop_last=False,
     sampler=dict(type='DefaultSampler', shuffle=False, round_up=False),
     dataset=dict(
-        type='CocoDataset',
+        type=dataset_type,
         data_root=data_root,
         data_mode=data_mode,
         ann_file='val/file.json',
