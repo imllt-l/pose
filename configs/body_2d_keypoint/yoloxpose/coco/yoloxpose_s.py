@@ -192,7 +192,7 @@ train_pipeline_stage2 = [
     dict(type='GenerateTarget', encoder=codec),
     dict(type='PackPoseInputs'),
 ]
-data_root = '/kaggle/input/ap-10k/ap-10k'
+data_root = '/kaggle/input/ap-10k/ap-10k/'
 dataset_type = 'AP10KDataset'
 data_mode = 'bottomup'
 # data_root = 'data/'
