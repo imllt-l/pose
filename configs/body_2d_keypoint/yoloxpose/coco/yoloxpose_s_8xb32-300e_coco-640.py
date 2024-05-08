@@ -282,20 +282,17 @@ test_dataloader = val_dataloader
 
 # evaluators
 
-val_evaluator = [
-    dict(type='CocoMetric', 
-        ann_file=data_root +'/val/file.json'),
-    dict(type='PCKAccuracy'),
-    dict(type='AUC'),
-    dict(type='NME', norm_mode='keypoint_distance', keypoint_indices=[0, 1])
-]
+# val_evaluator = [
+#     dict(type='CocoMetric', ann_file=data_root +'/val/file.json'),
+#     dict(type='PCKAccuracy'),
+#     dict(type='AUC'),
+#     dict(type='NME', norm_mode='keypoint_distance', keypoint_indices=[0, 1])
+# ]
 
-# val_evaluator = dict(
-#     type='CocoMetric',
-#     ann_file= data_root +'/val/file.json',
-#     score_mode='bbox',
-#     nms_mode='none',
-# )
+val_evaluator = dict(
+    type='CocoMetric',
+    ann_file= data_root +'/val/file.json'
+)
 test_evaluator = val_evaluator
 
 custom_hooks = [
