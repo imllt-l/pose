@@ -212,9 +212,7 @@ val_pipeline = [
     dict(
         type='BottomupResize', input_size=input_size, pad_val=(114, 114, 114)),
     dict(
-        type='PackPoseInputs',
-        meta_keys=('id', 'img_id', 'img_path', 'ori_shape', 'img_shape',
-                   'input_size', 'input_center', 'input_scale'))
+        type='PackPoseInputs')
 ]
 
 
