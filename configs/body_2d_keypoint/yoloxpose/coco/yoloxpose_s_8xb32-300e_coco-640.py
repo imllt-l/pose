@@ -122,7 +122,7 @@ model = dict(
         loss_oks=dict(
             type='OKSLoss',
             reduction='none',
-            metainfo='configs/_base_/datasets/coco.py',
+            metainfo='configs/_base_/datasets/cow-pose.py',
             norm_target_weight=True,
             loss_weight=30.0),
         loss_vis=dict(
@@ -218,7 +218,8 @@ val_pipeline = [
 
 
 train_dataloader = dict(
-    batch_size=16,
+# batch_size
+    batch_size=2,
     num_workers=2,
     persistent_workers=True,
     sampler=dict(type='DefaultSampler', shuffle=True),
