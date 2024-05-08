@@ -4,7 +4,7 @@ _base_ = '../../../_base_/default_runtime.py'
 train_cfg = dict(
     _delete_=True,
     type='EpochBasedTrainLoop',
-    max_epochs=300,
+    max_epochs=200,
     val_interval=10,
     dynamic_intervals=[(280, 1)])
 
@@ -192,7 +192,7 @@ train_pipeline_stage2 = [
     dict(type='GenerateTarget', encoder=codec),
     dict(type='PackPoseInputs'),
 ]
-
+data_root = '/kaggle/input/cow-pose-coco/Cow/'
 data_mode = 'bottomup'
 # data_root = 'data/'
 
@@ -224,12 +224,11 @@ train_dataloader = dict(
     persistent_workers=True,
     sampler=dict(type='DefaultSampler', shuffle=True),
     dataset = dict(type='CocoDataset',
-        data_root='/kaggle/input/cow-pose-coco/Cow',
+        data_root=data_root,
         # 标注文件路径为 {data_root}/{ann_file}
         # 例如： aaa/annotations/xxx.json
         ann_file='train/file-Train.json',
-        # 图片路径为 {data_root}/{img}/
-        # 例如： aaa/train/c.jpg
+        data_mode=data_mode,
         data_prefix=dict(img='train/img'),
         # 指定元信息配置文件
         metainfo=dict(from_file='configs/_base_/datasets/cow-pose.py'),
@@ -243,7 +242,7 @@ val_dataloader = dict(
     sampler=dict(type='DefaultSampler', shuffle=False, round_up=False),
     dataset=dict(
         type='CocoDataset',
-        data_root='/kaggle/input/cow-pose-coco/Cow',
+        data_root=data_root,
         data_mode=data_mode,
         ann_file='val/file.json',
         data_prefix=dict(img='val/img'),
@@ -280,12 +279,21 @@ val_dataloader = dict(
 test_dataloader = val_dataloader
 
 # evaluators
-val_evaluator = dict(
-    type='CocoMetric',
-    ann_file='/kaggle/input/cow-pose-coco/Cow/val/file.json',
-    score_mode='bbox',
-    nms_mode='none',
-)
+
+val_evaluator = [
+    dict(type='CocoMetric', 
+        ann_file=data_root +'/val/file.json'),
+    dict(type='PCKAccuracy'),
+    dict(type='AUC'),
+    dict(type='NME', norm_mode='keypoint_distance', keypoint_indices=[0, 1])
+]
+
+# val_evaluator = dict(
+#     type='CocoMetric',
+#     ann_file= data_root +'/val/file.json',
+#     score_mode='bbox',
+#     nms_mode='none',
+# )
 test_evaluator = val_evaluator
 
 custom_hooks = [
