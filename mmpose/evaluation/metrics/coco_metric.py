@@ -524,6 +524,8 @@ class CocoMetric(BaseMetric):
         for _, img_kpts in keypoints.items():
             _keypoints = np.array(
                 [img_kpt['keypoints'] for img_kpt in img_kpts])
+            
+            #print(_keypoints)
             num_keypoints = self.dataset_meta['num_keypoints']
             # collect all the person keypoints in current image
             _keypoints = _keypoints.reshape(-1, num_keypoints * 3)
@@ -541,7 +543,7 @@ class CocoMetric(BaseMetric):
                 result.append(res)
 
             cat_results.extend(result)
-
+            print(cat_results)
         res_file = f'{outfile_prefix}.keypoints.json'
         dump(cat_results, res_file, sort_keys=True, indent=4)
 
