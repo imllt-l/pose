@@ -144,11 +144,11 @@ codec = dict(type='YOLOXPoseAnnotationProcessor', input_size=input_size)
 ## 数据处理
 train_pipeline_stage1 = [
     dict(type='LoadImage', backend_args=None),
-    # dict(
-    #     type='Mosaic',
-    #     img_scale=(640, 640),
-    #     pad_val=114.0,
-    #     pre_transform=[dict(type='LoadImage', backend_args=None)]),
+    dict(
+        type='Mosaic',
+        img_scale=(640, 640),
+        pad_val=114.0,
+        pre_transform=[dict(type='LoadImage', backend_args=None)]),
     dict(
         type='BottomupRandomAffine',
         input_size=(640, 640),
@@ -220,7 +220,7 @@ val_pipeline = [
 
 train_dataloader = dict(
 # batch_size
-    batch_size=16,
+    batch_size=2,
     num_workers=2,
     persistent_workers=True,
     sampler=dict(type='DefaultSampler', shuffle=True),
@@ -234,7 +234,7 @@ train_dataloader = dict(
     )
 )
 test_dataloader = dict(
-    batch_size=32,
+    batch_size=16,
     num_workers=10,
     persistent_workers=True,
     drop_last=False,
@@ -249,7 +249,7 @@ test_dataloader = dict(
         pipeline=val_pipeline,
     ))
 val_dataloader = dict(
-    batch_size=1,
+    batch_size=16,
     num_workers=2,
     persistent_workers=True,
     drop_last=False,
