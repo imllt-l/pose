@@ -542,6 +542,8 @@ class CocoMetric(BaseMetric):
                 }
                 if 'bbox' in img_kpt:
                     res['bbox'] = img_kpt['bbox'].tolist()
+                print(type(img_kpt['img_id']))  # 应该打印出 <class 'int'> 或其他可哈希类型
+                print(type(img_kpt['category_id']))
                 result.append(res)
 
             cat_results.extend(result)
@@ -566,7 +568,7 @@ class CocoMetric(BaseMetric):
         # 假设 'res_file' 是您提供的 .json 文件路径
         with open(res_file) as f:
             data = json.load(f)
-            print(f"json:{data}")
+            #print(f"json:{data}")
         coco_det = self.coco.loadRes(res_file)
 
 
