@@ -566,8 +566,8 @@ class CocoMetric(BaseMetric):
         res_file = f'{outfile_prefix}.keypoints.json'
 
         # 假设 'res_file' 是您提供的 .json 文件路径
-        with open(res_file) as f:
-            data = json.load(f)
+        # with open(res_file) as f:
+        #     data = json.load(f)
             #print(f"json:{data}")
         coco_det = self.coco.loadRes(res_file)
 
