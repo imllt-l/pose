@@ -227,7 +227,7 @@ train_dataloader = dict(
         data_root=data_root,
         # 标注文件路径为 {data_root}/{ann_file}
         # 例如： aaa/annotations/xxx.json
-        ann_file='train/file-Train.json',
+        ann_file='train/train.json',
         data_mode=data_mode,
         data_prefix=dict(img='train/img'),
         # 指定元信息配置文件
@@ -244,7 +244,7 @@ val_dataloader = dict(
         type=dataset_type,
         data_root=data_root,
         data_mode=data_mode,
-        ann_file='val/file.json',
+        ann_file='val/val.json',
         data_prefix=dict(img='val/img'),
         test_mode=True,
         metainfo=dict(from_file='configs/_base_/datasets/cowpose.py'),
@@ -289,7 +289,7 @@ test_dataloader = val_dataloader
 
 val_evaluator = dict(
     type='CocoMetric',
-    ann_file= data_root +'/val/file.json'
+    ann_file= data_root +'/val/val.json'
 )
 test_evaluator = val_evaluator
 
