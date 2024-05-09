@@ -4,6 +4,8 @@ import os.path as osp
 import tempfile
 from collections import OrderedDict, defaultdict
 from typing import Dict, Optional, Sequence
+import json
+
 
 import numpy as np
 from mmengine.evaluator import BaseMetric
@@ -560,7 +562,11 @@ class CocoMetric(BaseMetric):
             name and corresponding stats value.
         """
         res_file = f'{outfile_prefix}.keypoints.json'
-        print(f"res_file:{res_file}")
+
+        # 假设 'res_file' 是您提供的 .json 文件路径
+        with open(res_file) as f:
+            data = json.load(f)
+            print(f"json:{data}")
         coco_det = self.coco.loadRes(res_file)
 
 
