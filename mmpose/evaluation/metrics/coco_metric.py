@@ -560,9 +560,9 @@ class CocoMetric(BaseMetric):
             name and corresponding stats value.
         """
         res_file = f'{outfile_prefix}.keypoints.json'
-        
+        print(f"res_file:{res_file}")
         coco_det = self.coco.loadRes(res_file)
-        print(f"coco_det:{coco_det}")
+
 
         sigmas = self.dataset_meta['sigmas']
         coco_eval = COCOeval(self.coco, coco_det, self.iou_type, sigmas,
