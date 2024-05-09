@@ -115,7 +115,7 @@ mmpose/.mim
 *.pkl.json
 *.log.json
 *.npy
-work_dirs/
+#work_dirs/
 docs/**/topics/
 docs/**/papers/*.md
 docs/**/datasets.md
