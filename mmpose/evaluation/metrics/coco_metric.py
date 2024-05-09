@@ -542,7 +542,7 @@ class CocoMetric(BaseMetric):
                 }
                 if 'bbox' in img_kpt:
                     res['bbox'] = img_kpt['bbox'].tolist()
-                print(type(img_kpt['img_id']))  # 应该打印出 <class 'int'> 或其他可哈希类型
+                #rint(type(img_kpt['img_id']))  # 应该打印出 <class 'int'> 或其他可哈希类型
                 print(type(img_kpt['category_id']))
                 result.append(res)
 
