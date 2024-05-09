@@ -536,14 +536,14 @@ class CocoMetric(BaseMetric):
             for img_kpt, keypoint in zip(img_kpts, _keypoints):
                 res = {
                     'image_id': img_kpt['img_id'],
-                    'category_id': img_kpt['category_id'],
+                    'category_id': int(img_kpt['category_id'].item()),
                     'keypoints': keypoint.tolist(),
                     'score': float(img_kpt['score']),
                 }
                 if 'bbox' in img_kpt:
                     res['bbox'] = img_kpt['bbox'].tolist()
                 #rint(type(img_kpt['img_id']))  # 应该打印出 <class 'int'> 或其他可哈希类型
-                print(type(img_kpt['category_id']))
+                #print(type(img_kpt['category_id']))
                 result.append(res)
 
             cat_results.extend(result)
