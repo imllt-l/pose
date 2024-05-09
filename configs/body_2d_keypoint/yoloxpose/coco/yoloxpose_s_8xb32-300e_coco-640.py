@@ -5,7 +5,7 @@ train_cfg = dict(
     _delete_=True,
     type='EpochBasedTrainLoop',
     max_epochs=300,
-    val_interval=1,
+    val_interval=10,
     dynamic_intervals=[(280, 1)])
 
 auto_scale_lr = dict(base_batch_size=16)
