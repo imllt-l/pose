@@ -4,7 +4,7 @@ _base_ = '../../../_base_/default_runtime.py'
 train_cfg = dict(
     _delete_=True,
     type='EpochBasedTrainLoop',
-    max_epochs=200,
+    max_epochs=300,
     val_interval=10,
     dynamic_intervals=[(280, 1)])
 
