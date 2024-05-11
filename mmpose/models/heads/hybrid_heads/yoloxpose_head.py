@@ -205,8 +205,9 @@ class YOLOXPoseHeadModule(BaseModule):
         cls_scores, bbox_preds, objectnesses = [], [], []
         kpt_offsets, kpt_vis = [], []
 
-        for i in range(len(x)):
 
+        for i in range(len(x)):
+            print(x[i].shape)
             cls_feat = self.conv_cls[i](x[i])
             reg_feat = self.conv_reg[i](x[i])
             pose_feat = self.conv_pose[i](x[i])

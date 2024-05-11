@@ -1,4 +1,4 @@
-_base_ = ['../../../_base_/default_runtime.py']
+_base_ = ['_base_/default_runtime.py']
 
 train_cfg = dict(
     _delete_=True,
@@ -27,9 +27,8 @@ param_scheduler = [
 ]
 
 # model
-widen_factor = 0.375
+widen_factor = 0.5
 deepen_factor = 0.33
-
 
 optim_wrapper = dict(
     type='OptimWrapper',
@@ -109,7 +108,7 @@ val_pipeline = [
 ]
 
 # dataset设置
-data_root = '/kaggle/input/cow-pose-coco/Cow/'
+data_root = '/Users/apple/Desktop/mmpose/dataset/Cow/'
 data_mode = 'bottomup'
 dataset_type = 'CowposeDataset'
 
@@ -206,7 +205,7 @@ model = dict(
                 size_divisor=32,
                 interval=1),
         ]),
-   backbone=dict(
+    backbone=dict(
         type='CSPDarknet',
         deepen_factor=deepen_factor,
         widen_factor=widen_factor,
@@ -220,7 +219,8 @@ model = dict(
         #     'yolox/yolox_s_8x8_300e_coco/yolox_s_8x8_300e_coco_'
         #     '20211121_095711-4592a793.pth',
         #     prefix='backbone.',
-        # )),
+        # )
+    ),
     neck=dict(
         type='HybridEncoder',
         in_channels=[128, 256, 512],
@@ -242,8 +242,9 @@ model = dict(
             out_channels=256,
             act_cfg=None,
             norm_cfg=dict(type='BN'),
-            num_outs=2)),
- head=dict(
+            num_outs=2)
+            ),
+    head=dict(
         type='YOLOXPoseHead',
         num_keypoints=17,
         featmap_strides=(16, 32),
@@ -292,15 +293,15 @@ model = dict(
             use_target_weight=True,
             reduction='mean',
             loss_weight=1.0),
-        loss_mle=dict(
-            type='MLECCLoss',
-            use_target_weight=True,
-            loss_weight=1.0,
-        ),
+        # loss_mle=dict(
+        #     type='MLECCLoss',
+        #     use_target_weight=True,
+        #     loss_weight=1.0,),
         loss_bbox_aux=dict(type='L1Loss', reduction='sum', loss_weight=1.0),
     ),
     test_cfg=dict(
         input_size=input_size,
         score_thr=0.1,
         nms_thr=0.65,
-    ))
+    )
+)
