@@ -245,7 +245,7 @@ model = dict(
             num_outs=2)
             ),
     head=dict(
-        type='YOLOXPoseHead',
+        type='YOLOFixPoseHead',
         num_keypoints=17,
         featmap_strides=(16, 32),
         head_module_cfg=dict(
