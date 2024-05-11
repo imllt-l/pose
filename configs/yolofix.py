@@ -4,7 +4,7 @@ train_cfg = dict(
     _delete_=True,
     type='EpochBasedTrainLoop',
     max_epochs=200,
-    val_interval=1,
+    val_interval=10,
     dynamic_intervals=[(195, 1)])
 
 #学习率调整
