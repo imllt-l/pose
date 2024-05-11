@@ -207,7 +207,7 @@ class YOLOXPoseHeadModule(BaseModule):
 
 
         for i in range(len(x)):
-            print(x[i].shape)
+            #print(x[i].shape)
             cls_feat, reg_feat = x[i].split(x[i].size(1) // 2, 1)
 
             cls_feat = self.conv_cls[i](cls_feat)
