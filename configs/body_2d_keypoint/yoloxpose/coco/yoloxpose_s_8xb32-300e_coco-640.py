@@ -74,13 +74,13 @@ model = dict(
         spp_kernal_sizes=(5, 9, 13),
         norm_cfg=dict(type='BN', momentum=0.03, eps=0.001),
         act_cfg=dict(type='Swish'),
-        # init_cfg=dict(
-        #     type='Pretrained',
-        #     checkpoint='https://download.openmmlab.com/mmdetection/v2.0/'
-        #     'yolox/yolox_s_8x8_300e_coco/yolox_s_8x8_300e_coco_'
-        #     '20211121_095711-4592a793.pth',
-        #     prefix='backbone.',
-        # )
+        init_cfg=dict(
+            type='Pretrained',
+            checkpoint='https://download.openmmlab.com/mmdetection/v2.0/'
+            'yolox/yolox_s_8x8_300e_coco/yolox_s_8x8_300e_coco_'
+            '20211121_095711-4592a793.pth',
+            prefix='backbone.',
+        )
         ),
     neck=dict(
         type='YOLOXPAFPN',
