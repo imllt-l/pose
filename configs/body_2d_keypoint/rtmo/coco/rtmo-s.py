@@ -6,7 +6,7 @@ train_cfg = dict(max_epochs=200, val_interval=10, dynamic_intervals=[(180, 1)])
 auto_scale_lr = dict(base_batch_size=256)
 
 default_hooks = dict(
-    checkpoint=dict(type='CheckpointHook', interval=40, max_keep_ckpts=3))
+    checkpoint=dict(type='CheckpointHook', interval=50, max_keep_ckpts=3))
 
 optim_wrapper = dict(
     type='OptimWrapper',
@@ -107,6 +107,8 @@ train_pipeline_stage2 = [
 
 data_mode = 'bottomup'
 data_root = '/kaggle/input/cow-pose-coco/Cow/'
+#data_root = '/Users/apple/Desktop/mmpose/dataset/Cow/'
+
 
 # train datasets
 dataset_coco = dict(
@@ -119,8 +121,8 @@ dataset_coco = dict(
 )
 
 train_dataloader = dict(
-    batch_size=32,
-    num_workers=8,
+    batch_size=16,
+    num_workers=4,
     persistent_workers=True,
     pin_memory=True,
     sampler=dict(type='DefaultSampler', shuffle=True),
