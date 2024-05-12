@@ -113,7 +113,7 @@ dataset_coco = dict(
     type='CocoDataset',
     data_root=data_root,
     data_mode=data_mode,
-    ann_file= data_root +'val/val.json',
+    ann_file= data_root +'train/train.json',
     data_prefix=dict(img='train/img'),
     pipeline=train_pipeline_stage1,
 )
