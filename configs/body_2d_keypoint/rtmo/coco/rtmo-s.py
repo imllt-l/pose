@@ -1,7 +1,7 @@
 _base_ = ['../../../_base_/default_runtime.py']
 
 # runtime
-train_cfg = dict(max_epochs=600, val_interval=20, dynamic_intervals=[(580, 1)])
+train_cfg = dict(max_epochs=200, val_interval=10, dynamic_intervals=[(180, 1)])
 
 auto_scale_lr = dict(base_batch_size=256)
 
@@ -106,15 +106,15 @@ train_pipeline_stage2 = [
 ]
 
 data_mode = 'bottomup'
-data_root = 'data/'
+data_root = '/kaggle/input/cow-pose-coco/Cow/'
 
 # train datasets
 dataset_coco = dict(
     type='CocoDataset',
     data_root=data_root,
     data_mode=data_mode,
-    ann_file='coco/annotations/person_keypoints_train2017.json',
-    data_prefix=dict(img='coco/train2017/'),
+    ann_file= data_root +'val/val.json',
+    data_prefix=dict(img='train/img'),
     pipeline=train_pipeline_stage1,
 )
 
@@ -147,8 +147,8 @@ val_dataloader = dict(
         type='CocoDataset',
         data_root=data_root,
         data_mode=data_mode,
-        ann_file='coco/annotations/person_keypoints_val2017.json',
-        data_prefix=dict(img='coco/val2017/'),
+        ann_file=data_root +'val/val.json',
+        data_prefix=dict(img='val/img'),
         test_mode=True,
         pipeline=val_pipeline,
     ))
@@ -157,7 +157,7 @@ test_dataloader = val_dataloader
 # evaluators
 val_evaluator = dict(
     type='CocoMetric',
-    ann_file=data_root + 'coco/annotations/person_keypoints_val2017.json',
+    ann_file=data_root +'val/val.json',
     score_mode='bbox',
     nms_mode='none',
 )
@@ -223,13 +223,14 @@ model = dict(
         spp_kernal_sizes=(5, 9, 13),
         norm_cfg=dict(type='BN', momentum=0.03, eps=0.001),
         act_cfg=dict(type='Swish'),
-        init_cfg=dict(
-            type='Pretrained',
-            checkpoint='https://download.openmmlab.com/mmdetection/v2.0/'
-            'yolox/yolox_s_8x8_300e_coco/yolox_s_8x8_300e_coco_'
-            '20211121_095711-4592a793.pth',
-            prefix='backbone.',
-        )),
+        # init_cfg=dict(
+        #     type='Pretrained',
+        #     checkpoint='https://download.openmmlab.com/mmdetection/v2.0/'
+        #     'yolox/yolox_s_8x8_300e_coco/yolox_s_8x8_300e_coco_'
+        #     '20211121_095711-4592a793.pth',
+        #     prefix='backbone.',
+        # )
+        ),
     neck=dict(
         type='HybridEncoder',
         in_channels=[128, 256, 512],
