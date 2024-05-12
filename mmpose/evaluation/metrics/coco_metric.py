@@ -536,7 +536,8 @@ class CocoMetric(BaseMetric):
             for img_kpt, keypoint in zip(img_kpts, _keypoints):
                 res = {
                     'image_id': img_kpt['img_id'],
-                    'category_id': int(img_kpt['category_id'].item()),
+                    #'category_id': int(img_kpt['category_id'].item()),
+                    'category_id': int(img_kpt['category_id']),
                     'keypoints': keypoint.tolist(),
                     'score': float(img_kpt['score']),
                 }
