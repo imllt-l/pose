@@ -47,7 +47,7 @@ def bbox_overlaps(bboxes1,
         >>> overlaps = bbox_overlaps(bboxes1, bboxes2, is_aligned=True)
         >>> assert overlaps.shape == (3, )
     """
-    assert mode in ['iou', 'iof', 'giou'], f'Unsupported mode {mode}'
+    assert mode in ['iou', 'iof', 'giou','piou'], f'Unsupported mode {mode}'
     assert (bboxes1.size(-1) == 4 or bboxes1.size(0) == 0)
     assert (bboxes2.size(-1) == 4 or bboxes2.size(0) == 0)
 
@@ -115,3 +115,26 @@ def bbox_overlaps(bboxes1,
         enclose_area = torch.max(enclose_area, eps_tensor)
         gious = ious - (enclose_area - union) / enclose_area
         return gious
+    
+    # PIoU计算逻辑的改进实现
+    if mode == 'piou':
+        assert is_aligned, "PIoU mode requires is_aligned=True"
+
+        inter = (torch.min(bboxes1[..., 2:], bboxes2[..., 2:]) - torch.max(bboxes1[..., :2], bboxes2[..., :2])).clamp(min=0).prod(dim=-1)
+        area1 = (bboxes1[..., 2:] - bboxes1[..., :2]).clamp(min=0).prod(dim=-1)
+        area2 = (bboxes2[..., 2:] - bboxes2[..., :2]).clamp(min=0).prod(dim=-1)
+        union = area1 + area2 - inter + eps
+
+        iou = inter / union
+
+        w1, h1 = bboxes1[..., 2] - bboxes1[..., 0], bboxes1[..., 3] - bboxes1[..., 1]
+        w2, h2 = bboxes2[..., 2] - bboxes2[..., 0], bboxes2[..., 3] - bboxes2[..., 1]
+
+        dw1 = torch.abs(torch.min(bboxes1[..., 0], bboxes1[..., 2]) - torch.min(bboxes2[..., 0], bboxes2[..., 2]))
+        dw2 = torch.abs(torch.max(bboxes1[..., 0], bboxes1[..., 2]) - torch.max(bboxes2[..., 0], bboxes2[..., 2]))
+        dh1 = torch.abs(torch.min(bboxes1[..., 1], bboxes1[..., 3]) - torch.min(bboxes2[..., 1], bboxes2[..., 3]))
+        dh2 = torch.abs(torch.max(bboxes1[..., 1], bboxes1[..., 3]) - torch.max(bboxes2[..., 1], bboxes2[..., 3]))
+        P = ((dw1 + dw2) / torch.abs(w2 - w1) + (dh1 + dh2) / torch.abs(h2 - h1)) / 4
+        
+        piou_value = 1 - iou - (1 - torch.exp(-(P ** 2))) + 1
+        return piou_value
