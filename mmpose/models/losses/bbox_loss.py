@@ -53,7 +53,7 @@ class IoULoss(nn.Module):
             target (torch.Tensor[N, K]): Target classification.
         """
         ious = bbox_overlaps(
-            output, target,'piou', is_aligned=True).clamp(min=self.eps)
+            output, target,'giou', is_aligned=True).clamp(min=self.eps)
 
         if self.mode == 'linear':
             loss = 1 - ious
