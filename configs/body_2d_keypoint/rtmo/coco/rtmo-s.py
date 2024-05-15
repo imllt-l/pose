@@ -106,7 +106,7 @@ train_pipeline_stage2 = [
 ]
 
 data_mode = 'bottomup'
-data_root = '/kaggle/input/cow-pose-coco/Cow/'
+data_root = '/Users/apple/Desktop/mmpose/dataset/ap-10k/'
 #data_root = '/Users/apple/Desktop/mmpose/dataset/Cow/'
 
 
@@ -115,8 +115,8 @@ dataset_coco = dict(
     type='CocoDataset',
     data_root=data_root,
     data_mode=data_mode,
-    ann_file= data_root +'train/train.json',
-    data_prefix=dict(img='train/img'),
+    ann_file= data_root +'annotations/ap10k-train-split1.json',
+    data_prefix=dict(img='data/'),
     pipeline=train_pipeline_stage1,
 )
 
@@ -149,8 +149,8 @@ val_dataloader = dict(
         type='CocoDataset',
         data_root=data_root,
         data_mode=data_mode,
-        ann_file=data_root +'val/val.json',
-        data_prefix=dict(img='val/img'),
+        ann_file=data_root +'annotations/ap10k-val-split1.json',
+        data_prefix=dict(img='data/'),
         test_mode=True,
         pipeline=val_pipeline,
     ))
@@ -159,7 +159,7 @@ test_dataloader = val_dataloader
 # evaluators
 val_evaluator = dict(
     type='CocoMetric',
-    ann_file=data_root +'val/val.json',
+    ann_file=data_root +'annotations/ap10k-val-split1.json',
     score_mode='bbox',
     nms_mode='none',
 )
