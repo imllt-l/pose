@@ -534,9 +534,14 @@ class YOLOFixPoseHead(BaseModule):
             keypoints=decoded_kpts,
             keypoints_visible=kpt_vis,
         )
-        
+
         print(f"pred_instances:{pred_instances}")
+        for key, value in pred_instances.items(): # 遍历字典
+            print(f"pred_instances: {key}: {value}") # 打印每一个键和值
+
         print(f"gt_instances:{gt_instances}")
+        for key, value in gt_instances.items(): # 遍历字典
+            print(f"gt_instances: {key}: {value}") # 打印每一个键和值
 
         assign_result = self.assigner.assign(
             pred_instances=pred_instances, gt_instances=gt_instances)
