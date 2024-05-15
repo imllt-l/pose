@@ -6,7 +6,7 @@ train_cfg = dict(max_epochs=200, val_interval=10, dynamic_intervals=[(180, 1)])
 auto_scale_lr = dict(base_batch_size=256)
 
 default_hooks = dict(
-    checkpoint=dict(type='CheckpointHook', interval=50, max_keep_ckpts=3))
+    checkpoint=dict(type='CheckpointHook', interval=50, max_keep_ckpts=1))
 
 optim_wrapper = dict(
     type='OptimWrapper',
@@ -50,7 +50,7 @@ param_scheduler = [
 
 # data
 input_size = (640, 640)
-metafile = 'configs/_base_/datasets/coco.py'
+metafile = 'configs/_base_/datasets/cowpose.py'
 codec = dict(type='YOLOXPoseAnnotationProcessor', input_size=input_size)
 
 train_pipeline_stage1 = [
@@ -106,7 +106,7 @@ train_pipeline_stage2 = [
 ]
 
 data_mode = 'bottomup'
-data_root = '/kaggle/input/ap-10k/ap-10k/'
+data_root = '/kaggle/input/cow-pose-coco/Cow/'
 #data_root = '/Users/apple/Desktop/mmpose/dataset/Cow/'
 
 
@@ -115,8 +115,8 @@ dataset_coco = dict(
     type='CocoDataset',
     data_root=data_root,
     data_mode=data_mode,
-    ann_file= data_root +'annotations/ap10k-train-split1.json',
-    data_prefix=dict(img='data/'),
+    ann_file= data_root +'train/train.json',
+    data_prefix=dict(img='train/img'),
     pipeline=train_pipeline_stage1,
 )
 
@@ -149,8 +149,8 @@ val_dataloader = dict(
         type='CocoDataset',
         data_root=data_root,
         data_mode=data_mode,
-        ann_file=data_root +'annotations/ap10k-val-split1.json',
-        data_prefix=dict(img='data/'),
+        ann_file=data_root +'val/val.json',
+        data_prefix=dict(img='val/img'),
         test_mode=True,
         pipeline=val_pipeline,
     ))
@@ -159,7 +159,7 @@ test_dataloader = val_dataloader
 # evaluators
 val_evaluator = dict(
     type='CocoMetric',
-    ann_file=data_root +'annotations/ap10k-val-split1.json',
+    ann_file=data_root +'val/val.json',
     score_mode='bbox',
     nms_mode='none',
 )

@@ -545,7 +545,7 @@ class YOLOFixPoseHead(BaseModule):
 
         assign_result = self.assigner.assign(
             pred_instances=pred_instances, gt_instances=gt_instances)
-        print(assign_result)
+        #print(assign_result)
         # sampling
         pos_inds = torch.nonzero(
             assign_result['gt_inds'] > 0, as_tuple=False).squeeze(-1).unique()
