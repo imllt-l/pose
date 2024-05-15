@@ -108,6 +108,7 @@ val_pipeline = [
 ]
 
 # dataset设置
+#data_root = '/Users/apple/Desktop/mmpose/dataset/ap-10k/'
 data_root = '/kaggle/input/ap-10k/ap-10k/'
 data_mode = 'bottomup'
 dataset_type = 'AP10KDataset'
@@ -261,7 +262,7 @@ model = dict(
         assigner=dict(
             type='SimOTAAssigner',
             dynamic_k_indicator='oks',
-            oks_calculator=dict(type='PoseOKS', metainfo='configs/_base_/datasets/cowpose.py'),
+            oks_calculator=dict(type='PoseOKS', metainfo='configs/_base_/datasets/ap10k.py'),
             use_keypoints_for_center=True),
         overlaps_power=0.5,
 
@@ -283,7 +284,7 @@ model = dict(
         loss_oks=dict(
             type='OKSLoss',
             reduction='none',
-            metainfo='configs/_base_/datasets/cowpose.py',
+            metainfo='configs/_base_/datasets/ap10k.py',
             norm_target_weight=True,
             loss_weight=30.0),
         loss_vis=dict(
