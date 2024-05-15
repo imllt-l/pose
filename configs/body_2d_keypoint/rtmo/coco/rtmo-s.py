@@ -106,7 +106,7 @@ train_pipeline_stage2 = [
 ]
 
 data_mode = 'bottomup'
-data_root = '/Users/apple/Desktop/mmpose/dataset/ap-10k/'
+data_root = '/kaggle/input/ap-10k/ap-10k/'
 #data_root = '/Users/apple/Desktop/mmpose/dataset/Cow/'
 
 
