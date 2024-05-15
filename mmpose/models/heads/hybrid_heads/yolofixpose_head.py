@@ -534,8 +534,10 @@ class YOLOFixPoseHead(BaseModule):
             keypoints=decoded_kpts,
             keypoints_visible=kpt_vis,
         )
+        
         print(f"pred_instances:{pred_instances}")
         print(f"gt_instances:{gt_instances}")
+
         assign_result = self.assigner.assign(
             pred_instances=pred_instances, gt_instances=gt_instances)
 
