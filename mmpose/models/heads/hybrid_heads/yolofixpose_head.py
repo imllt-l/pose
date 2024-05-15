@@ -662,6 +662,7 @@ class YOLOFixPoseHead(BaseModule):
         flatten_objectness = self._flatten_predictions(objectnesses).sigmoid()
         flatten_kpt_offsets = self._flatten_predictions(kpt_offsets)
         flatten_kpt_vis = self._flatten_predictions(kpt_vis).sigmoid()
+       
         flatten_bbox_preds = self.decode_bbox(flatten_bbox_preds,
                                               flatten_priors, flatten_stride)
         flatten_kpt_reg = self.decode_kpt_reg(flatten_kpt_offsets,

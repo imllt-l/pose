@@ -91,6 +91,70 @@ class RLELoss(nn.Module):
 
         return loss.sum()
 
+# @MODELS.register_module()
+# class RLE_DSNTLoss(nn.Module):
+#     """RLE_DSNTLoss loss.
+#     """
+#     def __init__(self,
+#                  use_target_weight=False,
+#                  size_average=True,
+#                  residual=True,
+#                  q_dis='laplace',
+#                  sigma=2.0):
+#         super().__init__()
+#         self.dsnt_loss = DSNTLoss(sigma=sigma, use_target_weight=use_target_weight)
+#         self.rle_loss = RLELoss(use_target_weight=use_target_weight,
+#                                 size_average=size_average,
+#                                 residual=residual,
+#                                 q_distribution=q_dis)
+#         self.use_target_weight = use_target_weight
+
+#     def forward(self, output, heatmap, target, target_weight=None):
+
+#         assert target_weight is not None
+#         loss1 = self.dsnt_loss(heatmap, target, target_weight)
+#         loss2 = self.rle_loss(output, target, target_weight)
+
+#         loss = loss1 + loss2 # 这里权重可以调参
+
+#         return loss
+
+# @MODELS.register_module()
+# class DSNTLoss(nn.Module):
+#     def __init__(self,
+#                  sigma,
+#                  use_target_weight=False,
+#                  size_average=True,
+#                  ):
+#         super(DSNTLoss, self).__init__()
+#         self.use_target_weight = use_target_weight
+#         self.sigma = sigma
+#         self.size_average = size_average
+    
+#     def forward(self, heatmap, target, target_weight=None):
+#         """Forward function.
+
+#         Note:
+#             - batch_size: N
+#             - num_keypoints: K
+#             - dimension of keypoints: D (D=2 or D=3)
+
+#         Args:
+#             output (torch.Tensor[N, K, D*2]): Output regression,
+#                     including coords and sigmas.
+#             target (torch.Tensor[N, K, D]): Target regression.
+#             target_weight (torch.Tensor[N, K, D]):
+#                 Weights across different joint types.
+#         """
+#         loss = dsntnn.js_reg_losses(heatmap, target, self.sigma)
+
+#         if self.size_average:
+#             loss /= len(loss)
+
+#         return loss.sum()
+
+
+
 
 @MODELS.register_module()
 class SmoothL1Loss(nn.Module):

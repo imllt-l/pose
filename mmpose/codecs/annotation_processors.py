@@ -44,6 +44,9 @@ class YOLOXPoseAnnotationProcessor(BaseAnnotationProcessor):
         bbox_score='bbox_scores',
         keypoints='keypoints',
         keypoints_visible='keypoints_visible',
+
+        keypoint_labels='keypoint_labels',
+        keypoint_weights='keypoint_weights',
         # remove 'bbox_scales' in default instance_mapping_table to avoid
         # length mismatch during training with multiple datasets
     )
@@ -53,6 +56,7 @@ class YOLOXPoseAnnotationProcessor(BaseAnnotationProcessor):
                  input_size: Optional[Tuple] = None):
         super().__init__()
         self.expand_bbox = expand_bbox
+        self.input_size = input_size
 
     def encode(self,
                keypoints: Optional[np.ndarray] = None,
@@ -96,5 +100,16 @@ class YOLOXPoseAnnotationProcessor(BaseAnnotationProcessor):
             # Convert category IDs to labels
             bbox_labels = np.array(category_id).astype(np.int8) - 1
             results['bbox_labels'] = bbox_labels
+
+        if keypoints_visible is None:
+            keypoints_visible = np.ones(keypoints.shape[:2], dtype=np.float32)
+
+        w, h = self.input_size
+        valid = ((keypoints >= 0) &
+                 (keypoints <= [w - 1, h - 1])).all(axis=-1) & (
+                     keypoints_visible > 0.5)
+
+        results['keypoint_labels'] = (keypoints / np.array([w, h])).astype(np.float32)
+        results['keypoint_weights'] = np.where(valid, 1., 0.).astype(np.float32)
 
         return results
