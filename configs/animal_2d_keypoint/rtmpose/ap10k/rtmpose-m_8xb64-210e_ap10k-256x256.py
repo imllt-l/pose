@@ -98,7 +98,7 @@ model = dict(
 # base dataset settings
 dataset_type = 'AP10KDataset'
 data_mode = 'topdown'
-data_root = 'data/ap10k/'
+data_root = '/kaggle/input/ap-10k/ap-10k/'
 
 backend_args = dict(backend='local')
 # backend_args = dict(
