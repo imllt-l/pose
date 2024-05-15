@@ -535,17 +535,17 @@ class YOLOFixPoseHead(BaseModule):
             keypoints_visible=kpt_vis,
         )
 
-        print(f"pred_instances:{pred_instances}")
-        for key, value in pred_instances.items(): # 遍历字典
-            print(f"pred_instances: {key}: {value.shape}") # 打印每一个键和值
+        # print(f"pred_instances:{pred_instances}")
+        # for key, value in pred_instances.items(): # 遍历字典
+        #     print(f"pred_instances: {key}: {value.shape}") # 打印每一个键和值
 
-        print(f"gt_instances:{gt_instances}")
-        for key, value in gt_instances.items(): # 遍历字典
-            print(f"gt_instances: {key}: {value.shape}") # 打印每一个键和值
+        # print(f"gt_instances:{gt_instances}")
+        # for key, value in gt_instances.items(): # 遍历字典
+        #     print(f"gt_instances: {key}: {value.shape}") # 打印每一个键和值
 
         assign_result = self.assigner.assign(
             pred_instances=pred_instances, gt_instances=gt_instances)
-
+        print(assign_result)
         # sampling
         pos_inds = torch.nonzero(
             assign_result['gt_inds'] > 0, as_tuple=False).squeeze(-1).unique()
