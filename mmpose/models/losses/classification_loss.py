@@ -203,7 +203,6 @@ class KLDiscretLoss(nn.Module):
         for pred, target in zip(pred_simcc, gt_simcc):
             pred = pred.reshape(-1, pred.size(-1))
             target = target.reshape(-1, target.size(-1))
-
             t_loss = self.criterion(pred, target).mul(weight)
 
             if self.mask is not None:

@@ -61,7 +61,7 @@ model = dict(
 # base dataset settings
 dataset_type = 'CocoDataset'
 data_mode = 'topdown'
-data_root = 'data/coco/'
+data_root = '/Users/apple/Desktop/mmpose/dataset/Cow/'
 
 # pipelines
 train_pipeline = [
@@ -91,8 +91,8 @@ train_dataloader = dict(
         type=dataset_type,
         data_root=data_root,
         data_mode=data_mode,
-        ann_file='annotations/person_keypoints_train2017.json',
-        data_prefix=dict(img='train2017/'),
+        ann_file='train/train.json',
+        data_prefix=dict(img='train/img'),
         pipeline=train_pipeline,
     ))
 val_dataloader = dict(
@@ -105,10 +105,8 @@ val_dataloader = dict(
         type=dataset_type,
         data_root=data_root,
         data_mode=data_mode,
-        ann_file='annotations/person_keypoints_val2017.json',
-        bbox_file=f'{data_root}person_detection_results/'
-        'COCO_val2017_detections_AP_H_56_person.json',
-        data_prefix=dict(img='val2017/'),
+        ann_file='val/val.json',
+        data_prefix=dict(img='val/img'),
         test_mode=True,
         pipeline=val_pipeline,
     ))
@@ -120,5 +118,5 @@ default_hooks = dict(checkpoint=dict(save_best='coco/AP', rule='greater'))
 # evaluators
 val_evaluator = dict(
     type='CocoMetric',
-    ann_file=data_root + 'annotations/person_keypoints_val2017.json')
+    ann_file=data_root + 'val/val.json')
 test_evaluator = val_evaluator

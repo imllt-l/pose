@@ -42,8 +42,9 @@ optim_wrapper = dict(
         custom_keys=dict({'neck.encoder': dict(lr_mult=0.05)})),
     clip_grad=dict(max_norm=0.1, norm_type=2))
 
-input_size = (640, 640)
-codec = dict(type='YOLOXPoseAnnotationProcessor', input_size=input_size)
+input_size = (640,640)
+codec = dict(
+    type='SimCCLabel', input_size=input_size, sigma=6.0, simcc_split_ratio=1.0)
 
 
 
@@ -108,8 +109,8 @@ val_pipeline = [
 ]
 
 # dataset设置
-#data_root = '/kaggle/input/cow-pose-coco/Cow/'
-data_root = '/Users/apple/Desktop/mmpose/dataset/Cow/'
+data_root = '/kaggle/input/cow-pose-coco/Cow/'
+#data_root = '/Users/apple/Desktop/mmpose/dataset/Cow/'
 data_mode = 'bottomup'
 dataset_type = 'CowposeDataset'
 
@@ -132,7 +133,7 @@ train_dataloader = dict(
         pipeline=train_pipeline_stage1)
 )
 val_dataloader = dict(
-    batch_size=16,
+    batch_size=32,
     num_workers=2,
     persistent_workers=True,
     drop_last=False,
@@ -144,7 +145,6 @@ val_dataloader = dict(
         ann_file='val/val.json',
         data_prefix=dict(img='val/img'),
         test_mode=True,
-        metainfo=dict(from_file='configs/_base_/datasets/cowpose.py'),
         pipeline=val_pipeline,
     ))
 
@@ -158,32 +158,32 @@ val_evaluator = dict(
 test_evaluator = val_evaluator
 
 
-# hooks
-custom_hooks = [
-    dict(
-        type='YOLOXPoseModeSwitchHook',
-        num_last_epochs=20,
-        new_train_pipeline=train_pipeline_stage2,
-        priority=48),
-    dict(
-        type='RTMOModeSwitchHook',
-        epoch_attributes={
-            280: {
-                'proxy_target_cc': True,
-                'loss_mle.loss_weight': 5.0,
-                'loss_oks.loss_weight': 10.0
-            },
-        },
-        priority=48),
-    dict(type='SyncNormHook', priority=48),
-    dict(
-        type='EMAHook',
-        ema_type='ExpMomentumEMA',
-        momentum=0.0002,
-        update_buffers=True,
-        strict_load=False,
-        priority=49),
-]
+# # hooks
+# custom_hooks = [
+#     dict(
+#         type='YOLOXPoseModeSwitchHook',
+#         num_last_epochs=20,
+#         new_train_pipeline=train_pipeline_stage2,
+#         priority=48),
+#     dict(
+#         type='RTMOModeSwitchHook',
+#         epoch_attributes={
+#             280: {
+#                 'proxy_target_cc': True,
+#                 'loss_mle.loss_weight': 5.0,
+#                 'loss_oks.loss_weight': 10.0
+#             },
+#         },
+#         priority=48),
+#     dict(type='SyncNormHook', priority=48),
+#     dict(
+#         type='EMAHook',
+#         ema_type='ExpMomentumEMA',
+#         momentum=0.0002,
+#         update_buffers=True,
+#         strict_load=False,
+#         priority=49),
+# ]
 
 model = dict(    
     type='BottomupPoseEstimator',
@@ -246,63 +246,14 @@ model = dict(
             num_outs=2)
             ),
     head=dict(
-        type='YOLOFixPoseHead',
-        num_keypoints=17,
-        featmap_strides=(16, 32),
-        head_module_cfg=dict(
-            num_classes=1,
-            in_channels=256,
-            feat_channels=256,
-            widen_factor=widen_factor,
-            stacked_convs=2,
-            norm_cfg=dict(type='BN', momentum=0.03, eps=0.001),
-            act_cfg=dict(type='Swish')),
-        prior_generator=dict(
-            type='MlvlPointGenerator',
-            offset=0,
-            strides=[16, 32]),
-        assigner=dict(
-            type='SimOTAAssigner',
-            dynamic_k_indicator='oks',
-            oks_calculator=dict(type='PoseOKS', metainfo='configs/_base_/datasets/cowpose.py'),
-            use_keypoints_for_center=True),
-        overlaps_power=0.5,
-
-        loss_cls=dict(
-            type='BCELoss',
-            reduction='sum',
-            loss_weight=1.0),
-        loss_bbox=dict(
-            type='IoULoss',
-            mode='square',
-            eps=1e-16,
-            reduction='sum',
-            loss_weight=5.0),
-        loss_obj=dict(
-            type='BCELoss',
-            use_target_weight=True,
-            reduction='sum',
-            loss_weight=1.0),
-        loss_oks=dict(
-            type='OKSLoss',
-            reduction='none',
-            metainfo='configs/_base_/datasets/cowpose.py',
-            norm_target_weight=True,
-            loss_weight=30.0),
-        loss_vis=dict(
-            type='BCELoss',
-            use_target_weight=True,
-            reduction='mean',
-            loss_weight=1.0),
-        # loss_mle=dict(
-        #     type='MLECCLoss',
-        #     use_target_weight=True,
-        #     loss_weight=1.0,),
-        loss_bbox_aux=dict(type='L1Loss', reduction='sum', loss_weight=1.0),
-    ),
-    test_cfg=dict(
-        input_size=input_size,
-        score_thr=0.1,
-        nms_thr=0.65,
-    )
+        type='SimCCHead',
+        in_channels=512,
+        out_channels=17,
+        input_size=codec['input_size'],
+        in_featuremap_size=tuple([s // 32 for s in codec['input_size']]),
+        simcc_split_ratio=codec['simcc_split_ratio'],
+        deconv_out_channels=None,
+        loss=dict(type='KLDiscretLoss', use_target_weight=True),
+        decoder=codec),
+    test_cfg=dict(flip_test=True, )
 )

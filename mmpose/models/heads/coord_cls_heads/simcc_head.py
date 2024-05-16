@@ -7,6 +7,7 @@ from mmcv.cnn import build_conv_layer
 from mmengine.dist import get_dist_info
 from mmengine.structures import PixelData
 from torch import Tensor, nn
+import torch.nn.functional as F
 
 from mmpose.codecs.utils import get_simcc_normalized
 from mmpose.evaluation.functional import simcc_pck_accuracy
@@ -210,12 +211,19 @@ class SimCCHead(BaseHead):
             pred_x (Tensor): 1d representation of x.
             pred_y (Tensor): 1d representation of y.
         """
+
+        feat1_downsampled = F.avg_pool2d(feats[0], kernel_size=2, stride=2)
+        feat = torch.cat((feats[-1], feat1_downsampled), dim=1)  
+        
+        
+        
         if self.deconv_head is None:
-            feats = feats[-1]
+            feats = feat
             if self.final_layer is not None:
                 feats = self.final_layer(feats)
         else:
             feats = self.deconv_head(feats)
+
 
         # flatten the output heatmap
         x = torch.flatten(feats, 2)
@@ -323,16 +331,16 @@ class SimCCHead(BaseHead):
         pred_x, pred_y = self.forward(feats)
 
         gt_x = torch.cat([
-            d.gt_instance_labels.keypoint_x_labels for d in batch_data_samples
+            d.gt_instance_labels.keypoint_x_labels[0:1] for d in batch_data_samples
         ],
                          dim=0)
         gt_y = torch.cat([
-            d.gt_instance_labels.keypoint_y_labels for d in batch_data_samples
+            d.gt_instance_labels.keypoint_y_labels[0:1] for d in batch_data_samples
         ],
                          dim=0)
         keypoint_weights = torch.cat(
             [
-                d.gt_instance_labels.keypoint_weights
+                d.gt_instance_labels.keypoint_weights[0:1]
                 for d in batch_data_samples
             ],
             dim=0,
@@ -340,6 +348,15 @@ class SimCCHead(BaseHead):
 
         pred_simcc = (pred_x, pred_y)
         gt_simcc = (gt_x, gt_y)
+        
+        #print(f"{batch_data_samples[0].gt_instance_labels.keypoint_x_labels[0:1].shape}")
+        # for d in batch_data_samples:
+            # print(f"gt_x_label:{[d.gt_instance_labels.keypoint_x_labels[0:1].shape for d in batch_data_samples]}")
+            # print(f"gt_y_label:{d.gt_instance_labels['keypoint_y_labels'].shape}")
+        # print(f"pred_x:{pred_x.shape}")
+        # print(f"pred_y:{pred_y.shape}")
+        # print(f"gt_x:{gt_x.shape}")
+        # print(f"gt_y:{gt_y.shape}")
 
         # calculate losses
         losses = dict()
