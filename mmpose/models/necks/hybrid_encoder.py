@@ -278,7 +278,10 @@ class HybridEncoder(BaseModule):
         if self.projector is not None:
             outs = self.projector(outs)
 
-        return tuple(outs)
+        feat1_downsampled = F.avg_pool2d(outs[0], kernel_size=2, stride=2)
+        feat = torch.cat((outs[-1], feat1_downsampled), dim=1)  
+        print(feat.shape)
+        return feat
 
     def switch_to_deploy(self, test_cfg):
         """Switch to deploy mode."""

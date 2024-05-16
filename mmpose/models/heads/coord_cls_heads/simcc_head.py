@@ -212,11 +212,8 @@ class SimCCHead(BaseHead):
             pred_y (Tensor): 1d representation of y.
         """
 
-        feat1_downsampled = F.avg_pool2d(feats[0], kernel_size=2, stride=2)
-        feat = torch.cat((feats[-1], feat1_downsampled), dim=1)  
-        
         if self.deconv_head is None:
-            feats = feat
+            #feats = feats[-1]
             if self.final_layer is not None:
                 feats = self.final_layer(feats)
         else:
