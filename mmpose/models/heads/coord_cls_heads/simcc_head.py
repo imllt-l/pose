@@ -215,8 +215,6 @@ class SimCCHead(BaseHead):
         feat1_downsampled = F.avg_pool2d(feats[0], kernel_size=2, stride=2)
         feat = torch.cat((feats[-1], feat1_downsampled), dim=1)  
         
-        
-        
         if self.deconv_head is None:
             feats = feat
             if self.final_layer is not None:
@@ -227,7 +225,7 @@ class SimCCHead(BaseHead):
 
         # flatten the output heatmap
         x = torch.flatten(feats, 2)
-
+        
         pred_x = self.mlp_head_x(x)
         pred_y = self.mlp_head_y(x)
 
@@ -353,10 +351,10 @@ class SimCCHead(BaseHead):
         # for d in batch_data_samples:
             # print(f"gt_x_label:{[d.gt_instance_labels.keypoint_x_labels[0:1].shape for d in batch_data_samples]}")
             # print(f"gt_y_label:{d.gt_instance_labels['keypoint_y_labels'].shape}")
-        # print(f"pred_x:{pred_x.shape}")
-        # print(f"pred_y:{pred_y.shape}")
-        # print(f"gt_x:{gt_x.shape}")
-        # print(f"gt_y:{gt_y.shape}")
+        print(f"pred_x:{pred_x.shape}")
+        print(f"pred_y:{pred_y.shape}")
+        print(f"gt_x:{gt_x.shape}")
+        print(f"gt_y:{gt_y.shape}")
 
         # calculate losses
         losses = dict()
