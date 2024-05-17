@@ -798,7 +798,7 @@ class OKSLoss(nn.Module):
         elif self.reduction == 'mean':
             loss = loss.mean()
 
-        loss2 = self.rle_loss(output, target, target_weight)
+        loss2 = self.rle_loss(pred=output, target=target, target_weight=target_weight)
 
 
         return (loss+loss2) * self.loss_weight
