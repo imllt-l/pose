@@ -124,7 +124,7 @@ class HybridEncoder(BaseModule):
     def __init__(self,
                  encoder_cfg: ConfigType = dict(),
                  projector: OptConfigType = None,
-                 num_encoder_layers: int = 1,
+                 num_encoder_layers: int = 6,
                  in_channels: List[int] = [512, 1024, 2048],
                  feat_strides: List[int] = [8, 16, 32],
                  hidden_dim: int = 256,
