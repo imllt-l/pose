@@ -798,7 +798,6 @@ class OKSLoss(nn.Module):
 
 
         loss2 = self.jointboneLoss(joint_out = output,joint_gt = target)
-        print(f"loss:{loss.shape}  loss2:{loss2.shape}")
         return (loss +loss2) * self.loss_weight
     
 
@@ -852,9 +851,7 @@ class RLELoss(nn.Module):
                 Weights across different joint types.
         """
         sigma = sigma.sigmoid()
-        print(f"sigma:{sigma.shape}")
-        print(f"pred:{pred.shape}")
-        print(f"target:{target.shape}")
+
         error = (pred - target) / (sigma + 1e-9)
         # (B, K, 2)
         log_phi = self.flow_model.log_prob(error.reshape(-1, 2))
@@ -898,6 +895,7 @@ class JointBoneLoss(nn.Module):
         self.id_j = id_j
 
     def forward(self, joint_out, joint_gt):
+        print(f"joint_out:{joint_out.shape}")
         if len(joint_out.shape) == 4: # (b, n, h, w) heatmap-based featuremap 
             calc_dim = [2, 3]
         elif len(joint_out.shape) == 3:# (b, n, 2) or (b, n, 3) regression-based result
