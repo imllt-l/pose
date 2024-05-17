@@ -276,7 +276,11 @@ class YOLOFixPoseHead(BaseModule):
 
     def forward(self, feats: Features):
         assert isinstance(feats, (tuple, list))
+        # for f in feats:
+        #     print(f"feat:{f.shape}")
+            
         return self.head_module(feats)
+
 
     def loss(self,
              feats: Tuple[Tensor],
