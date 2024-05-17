@@ -800,6 +800,7 @@ class OKSLoss(nn.Module):
 
         loss2 = self.rle_loss(output, target, target_weight)
 
+
         return (loss+loss2) * self.loss_weight
     
 
@@ -853,7 +854,9 @@ class RLELoss(nn.Module):
                 Weights across different joint types.
         """
         sigma = sigma.sigmoid()
-
+        print(f"sigma:{sigma.shape}")
+        print(f"pred:{pred.shape}")
+        print(f"target:{target.shape}")
         error = (pred - target) / (sigma + 1e-9)
         # (B, K, 2)
         log_phi = self.flow_model.log_prob(error.reshape(-1, 2))
