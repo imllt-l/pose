@@ -797,7 +797,7 @@ class OKSLoss(nn.Module):
             loss = loss.mean()
 
         loss2 = self.jointboneLoss(joint_out = output,joint_gt = target)
-        print(f"loss:{loss.shape} loss2:{loss2.shape}")
+        print(f"loss:{loss.shape} loss2:{loss2[0].shape}")
         return (loss +loss2.size(0)) * self.loss_weight
     
 
@@ -889,8 +889,8 @@ class JointBoneLoss(nn.Module):
         id_i, id_j = [], []
         for i in range(joint_num):
             for j in range(i+1, joint_num):
-                id_i.append(i)
-                id_j.append(j)
+                id_i= i
+                id_j=j
         self.id_i = id_i
         self.id_j = id_j
 
@@ -904,4 +904,4 @@ class JointBoneLoss(nn.Module):
         J = torch.norm(joint_out[:,self.id_i,:] - joint_out[:,self.id_j,:], p=2, dim=calc_dim, keepdim=False)
         Y = torch.norm(joint_gt[:,self.id_i,:] - joint_gt[:,self.id_j,:], p=2, dim=calc_dim, keepdim=False)
         loss = torch.abs(J-Y)
-        return loss.mean()
+        return loss
