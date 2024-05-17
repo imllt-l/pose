@@ -797,8 +797,8 @@ class OKSLoss(nn.Module):
             loss = loss.mean()
 
         loss2 = self.jointboneLoss(joint_out = output,joint_gt = target)
-        print(f"loss:{loss.shape} loss2:{loss2[0].shape}{loss2[1].shape}")
-        return (loss +loss2[1]) * self.loss_weight
+        print(f"loss:{loss.shape} loss2:{loss2[0].shape}")
+        return (loss +loss2.size(0)) * self.loss_weight
     
 
 
@@ -895,11 +895,11 @@ class JointBoneLoss(nn.Module):
         self.id_j = id_j
 
     def forward(self, joint_out, joint_gt):
-        print(f"joint_out:{joint_out.shape}")
-        if len(joint_out.shape) == 4: # (b, n, h, w) heatmap-based featuremap 
-            calc_dim = [2, 3]
-        elif len(joint_out.shape) == 3:# (b, n, 2) or (b, n, 3) regression-based result
-            calc_dim = -1
+        # print(f"joint_out:{joint_out.shape}")
+        # if len(joint_out.shape) == 4: # (b, n, h, w) heatmap-based featuremap 
+        #     calc_dim = [2, 3]
+        # elif len(joint_out.shape) == 3:# (b, n, 2) or (b, n, 3) regression-based result
+        calc_dim = -1
         
         J = torch.norm(joint_out[:,self.id_i,:] - joint_out[:,self.id_j,:], p=2, dim=calc_dim, keepdim=False)
         Y = torch.norm(joint_gt[:,self.id_i,:] - joint_gt[:,self.id_j,:], p=2, dim=calc_dim, keepdim=False)
