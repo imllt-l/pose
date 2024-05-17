@@ -798,7 +798,7 @@ class OKSLoss(nn.Module):
 
 
         loss2 = self.jointboneLoss(joint_out = output,joint_gt = target)
-
+        print(f"loss:{loss.shape}  loss2:{loss2.shape}")
         return (loss +loss2) * self.loss_weight
     
 
