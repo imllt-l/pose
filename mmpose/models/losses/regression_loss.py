@@ -741,16 +741,16 @@ class OKSLoss(nn.Module):
         self.mode = mode
         self.norm_target_weight = norm_target_weight
         self.eps = eps
-        self.rle_loss = RLELoss(use_target_weight=norm_target_weight,
-                                size_average=False,
-                                residual=True,
-                                q_distribution='laplace')
 
         if metainfo is not None:
             metainfo = parse_pose_metainfo(dict(from_file=metainfo))
             sigmas = metainfo.get('sigmas', None)
+            joint  = metainfo.get('keypoint_id2name',None)
+            print(f"joint:{joint}__shape:{joint.shape}")
             if sigmas is not None:
                 self.register_buffer('sigmas', torch.as_tensor(sigmas))
+            # self.jointboneLoss = JointBoneLoss(joint_num=metainfo.get('',None))
+
 
     def forward(self, output, target, target_weight=None, areas=None):
         """Forward function.
@@ -798,10 +798,9 @@ class OKSLoss(nn.Module):
         elif self.reduction == 'mean':
             loss = loss.mean()
 
-        loss2 = self.rle_loss(pred=output, target=target, target_weight=target_weight)
 
 
-        return (loss+loss2) * self.loss_weight
+        return loss * self.loss_weight
     
 
 
