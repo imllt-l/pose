@@ -741,7 +741,7 @@ class OKSLoss(nn.Module):
         self.mode = mode
         self.norm_target_weight = norm_target_weight
         self.eps = eps
-        self.jointboneLoss = JointBoneLoss(joint_num=16)
+        #self.jointboneLoss = JointBoneLoss(joint_num=16)
 
         if metainfo is not None:
             metainfo = parse_pose_metainfo(dict(from_file=metainfo))
@@ -796,9 +796,7 @@ class OKSLoss(nn.Module):
         elif self.reduction == 'mean':
             loss = loss.mean()
 
-        loss2 = self.jointboneLoss(joint_out = output,joint_gt = target)
-        print(f"loss:{loss.shape} loss2:{loss2[0].shape}")
-        return (loss +loss2.size(0)) * self.loss_weight
+        return (loss ) * self.loss_weight
     
 
 
