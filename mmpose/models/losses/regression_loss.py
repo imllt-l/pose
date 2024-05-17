@@ -904,4 +904,4 @@ class JointBoneLoss(nn.Module):
         J = torch.norm(joint_out[:,self.id_i,:] - joint_out[:,self.id_j,:], p=2, dim=calc_dim, keepdim=False)
         Y = torch.norm(joint_gt[:,self.id_i,:] - joint_gt[:,self.id_j,:], p=2, dim=calc_dim, keepdim=False)
         loss = torch.abs(J-Y)
-        return loss
+        return loss.mean()
