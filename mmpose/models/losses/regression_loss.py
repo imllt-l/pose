@@ -746,7 +746,7 @@ class OKSLoss(nn.Module):
             metainfo = parse_pose_metainfo(dict(from_file=metainfo))
             sigmas = metainfo.get('sigmas', None)
             joint  = metainfo.get('keypoint_id2name',None)
-            print(f"joint:{joint}__shape:{joint.shape}")
+            print(f"joint:{joint}")
             if sigmas is not None:
                 self.register_buffer('sigmas', torch.as_tensor(sigmas))
             # self.jointboneLoss = JointBoneLoss(joint_num=metainfo.get('',None))
