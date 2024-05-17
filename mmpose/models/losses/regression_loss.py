@@ -741,16 +741,13 @@ class OKSLoss(nn.Module):
         self.mode = mode
         self.norm_target_weight = norm_target_weight
         self.eps = eps
+        self.jointboneLoss = JointBoneLoss(joint_num=16)
 
         if metainfo is not None:
             metainfo = parse_pose_metainfo(dict(from_file=metainfo))
             sigmas = metainfo.get('sigmas', None)
-            joint  = metainfo.get('skeleton_links',None)
-            joint_num  = metainfo.get('num_skeleton_links',None)
-            print(f"joint:{joint} link_num:{joint_num}")
             if sigmas is not None:
                 self.register_buffer('sigmas', torch.as_tensor(sigmas))
-            # self.jointboneLoss = JointBoneLoss(joint_num=metainfo.get('',None))
 
 
     def forward(self, output, target, target_weight=None, areas=None):
@@ -800,8 +797,9 @@ class OKSLoss(nn.Module):
             loss = loss.mean()
 
 
+        loss2 = self.jointboneLoss(joint_out = output,joint_gt = target)
 
-        return loss * self.loss_weight
+        return (loss +loss2) * self.loss_weight
     
 
 
