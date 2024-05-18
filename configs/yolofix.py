@@ -108,8 +108,8 @@ val_pipeline = [
 ]
 
 # dataset设置
-data_root = '/kaggle/input/cow-pose-coco/Cow/'
-#data_root = '/Users/apple/Desktop/mmpose/dataset/Cow/'
+#data_root = '/kaggle/input/cow-pose-coco/Cow/'
+data_root = '/Users/apple/Desktop/mmpose/dataset/Cow/'
 data_mode = 'bottomup'
 dataset_type = 'CowposeDataset'
 
@@ -269,7 +269,7 @@ model = dict(
         overlaps_power=0.5,
 
         loss_cls=dict(
-            type='BCELoss',
+            type='VariFocalLoss',
             reduction='sum',
             loss_weight=1.0),
         loss_bbox=dict(
