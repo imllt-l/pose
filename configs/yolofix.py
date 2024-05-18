@@ -108,8 +108,8 @@ val_pipeline = [
 ]
 
 # dataset设置
-#data_root = '/kaggle/input/cow-pose-coco/Cow/'
-data_root = '/Users/apple/Desktop/mmpose/dataset/Cow/'
+data_root = '/kaggle/input/cow-pose-coco/Cow/'
+#data_root = '/Users/apple/Desktop/mmpose/dataset/Cow/'
 data_mode = 'bottomup'
 dataset_type = 'CowposeDataset'
 
