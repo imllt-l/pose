@@ -45,6 +45,13 @@ param_scheduler = [
 widen_factor = 0.5
 deepen_factor = 0.33
 
+
+#data_root = '/kaggle/input/ap-10k/ap-10k/'
+data_root = '/Users/apple/Desktop/mmpose/dataset/ap-10k/'
+metainfo = 'configs/_base_/datasets/ap10k.py'
+dataset_type = 'AP10KDataset'
+data_mode = 'bottomup'
+
 model = dict(
     type='BottomupPoseEstimator',
     init_cfg=dict(
@@ -122,7 +129,7 @@ model = dict(
         loss_oks=dict(
             type='OKSLoss',
             reduction='none',
-            metainfo='configs/_base_/datasets/cow-pose.py',
+            metainfo=metainfo,
             norm_target_weight=True,
             loss_weight=30.0),
         loss_vis=dict(
@@ -192,9 +199,7 @@ train_pipeline_stage2 = [
     dict(type='GenerateTarget', encoder=codec),
     dict(type='PackPoseInputs'),
 ]
-data_root = '/kaggle/input/ap-10k/ap-10k/'
-dataset_type = 'AP10KDataset'
-data_mode = 'bottomup'
+
 # data_root = 'data/'
 
 # dataset_coco = dict(
