@@ -46,8 +46,8 @@ widen_factor = 0.5
 deepen_factor = 0.33
 
 
-#data_root = '/kaggle/input/ap-10k/ap-10k/'
-data_root = '/Users/apple/Desktop/mmpose/dataset/ap-10k/'
+data_root = '/kaggle/input/ap-10k/ap-10k/'
+#data_root = '/Users/apple/Desktop/mmpose/dataset/ap-10k/'
 metainfo = 'configs/_base_/datasets/ap10k.py'
 dataset_type = 'AP10KDataset'
 data_mode = 'bottomup'
