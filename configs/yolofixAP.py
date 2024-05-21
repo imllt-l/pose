@@ -108,8 +108,8 @@ val_pipeline = [
 ]
 
 # dataset设置
-#data_root = '/kaggle/input/cow-pose-coco/Cow/'
-data_root = '/Users/apple/Desktop/mmpose/dataset/Cow/'
+data_root = '/kaggle/input/animal-pose-dataset/'
+#data_root = '/Users/apple/Desktop/mmpose/dataset/Cow/'
 data_mode = 'bottomup'
 dataset_type = 'CowposeDataset'
 
@@ -124,9 +124,9 @@ train_dataloader = dict(
         data_root=data_root,
         # 标注文件路径为 {data_root}/{ann_file}
         # 例如： aaa/annotations/xxx.json
-        ann_file='train/train.json',
+        ann_file='keypoints.json',
         data_mode=data_mode,
-        data_prefix=dict(img='train/img'),
+        data_prefix=dict(img='images/images'),
         # 指定元信息配置文件
         metainfo=dict(from_file='configs/_base_/datasets/cowpose.py'),
         pipeline=train_pipeline_stage1)
@@ -249,7 +249,6 @@ model = dict(
         type='YOLOFixPoseHead',
         num_keypoints=17,
         featmap_strides=(16, 32),
-        use_aux_loss = True,
         head_module_cfg=dict(
             num_classes=1,
             in_channels=256,
@@ -300,7 +299,6 @@ model = dict(
         #     use_target_weight=True,
         #     loss_weight=1.0,),
         loss_bbox_aux=dict(type='L1Loss', reduction='sum', loss_weight=1.0),
-        loss_kpt_aux=dict(type='L1Loss', reduction='sum', loss_weight=1.0),
     ),
     test_cfg=dict(
         input_size=input_size,
