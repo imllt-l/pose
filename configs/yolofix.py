@@ -240,7 +240,7 @@ model = dict(
             type='ChannelMapper',
             in_channels=[256, 256],
             kernel_size=1,
-            out_channels=256,
+            out_channels=128,
             act_cfg=None,
             norm_cfg=dict(type='BN'),
             num_outs=2)
@@ -249,7 +249,6 @@ model = dict(
         type='YOLOFixPoseHead',
         num_keypoints=17,
         featmap_strides=(16, 32),
-        use_aux_loss = True,
         head_module_cfg=dict(
             num_classes=1,
             in_channels=256,
@@ -299,8 +298,7 @@ model = dict(
         #     type='MLECCLoss',
         #     use_target_weight=True,
         #     loss_weight=1.0,),
-        loss_bbox_aux=dict(type='L1Loss', reduction='sum', loss_weight=1.0),
-        loss_kpt_aux=dict(type='L1Loss', reduction='sum', loss_weight=1.0),
+        loss_bbox_aux=dict(type='L1Loss', reduction='sum', loss_weight=1.0)
     ),
     test_cfg=dict(
         input_size=input_size,

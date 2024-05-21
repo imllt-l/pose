@@ -208,10 +208,10 @@ class YOLOXPoseHeadModule(BaseModule):
 
         for i in range(len(x)):
             #print(x[i].shape)
-            cls_feat, reg_feat = x[i].split(x[i].size(1) // 2, 1)
+            #cls_feat, reg_feat = x[i].split(x[i].size(1) // 2, 1)
 
-            cls_feat = self.conv_cls[i](cls_feat)
-            reg_feat = self.conv_pose[i](reg_feat)
+            cls_feat = self.conv_cls[i](x[i])
+            reg_feat = self.conv_pose[i](x[i])
 
             cls_scores.append(self.out_cls[i](cls_feat))
             bbox_preds.append(self.out_bbox[i](reg_feat))
