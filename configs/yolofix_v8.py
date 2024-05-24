@@ -190,8 +190,8 @@ train_pipeline_stage2 = [
     dict(type='GenerateTarget', encoder=codec),
     dict(type='PackPoseInputs'),
 ]
-#data_root = '/kaggle/input/cow-pose-coco/Cow/'
-data_root = '/Users/apple/Desktop/mmpose/dataset/Cow/'
+data_root = '/kaggle/input/cow-pose-coco/Cow/'
+#data_root = '/Users/apple/Desktop/mmpose/dataset/Cow/'
 data_mode = 'bottomup'
 dataset_type = 'CowposeDataset'
 # data_root = 'data/'
