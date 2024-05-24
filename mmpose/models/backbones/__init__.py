@@ -2,6 +2,7 @@
 from .alexnet import AlexNet
 from .cpm import CPM
 from .csp_darknet import CSPDarknet
+from .csp_darknet_v8 import CSPDarknetV8
 from .cspnext import CSPNeXt
 from .dstformer import DSTFormer
 from .hourglass import HourglassNet
@@ -37,5 +38,5 @@ __all__ = [
     'MSPN', 'ResNeSt', 'VGG', 'TCN', 'ViPNAS_ResNet', 'ViPNAS_MobileNetV3',
     'LiteHRNet', 'V2VNet', 'HRFormer', 'PyramidVisionTransformer',
     'PyramidVisionTransformerV2', 'SwinTransformer', 'DSTFormer', 'CSPDarknet',
-    'CSPNeXt'
+    'CSPNeXt','CSPDarknetV8'
 ]
