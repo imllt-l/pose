@@ -81,11 +81,9 @@ model = dict(
         # )
         ),
     neck=dict(
-        type='YOLOXPAFPN',
+        type='YOLOV8PAFPN',
         in_channels=[128,256,256],
         out_channels=128,
-        num_csp_blocks=1,
-        use_depthwise=False,
         upsample_cfg=dict(scale_factor=2, mode='nearest'),
         norm_cfg=dict(type='BN', momentum=0.03, eps=0.001),
         act_cfg=dict(type='SiLU')),
@@ -190,8 +188,8 @@ train_pipeline_stage2 = [
     dict(type='GenerateTarget', encoder=codec),
     dict(type='PackPoseInputs'),
 ]
-data_root = '/kaggle/input/cow-pose-coco/Cow/'
-#data_root = '/Users/apple/Desktop/mmpose/dataset/Cow/'
+#data_root = '/kaggle/input/cow-pose-coco/Cow/'
+data_root = '/Users/apple/Desktop/mmpose/dataset/Cow/'
 data_mode = 'bottomup'
 dataset_type = 'CowposeDataset'
 # data_root = 'data/'
