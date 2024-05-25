@@ -223,7 +223,7 @@ model = dict(
     ),
     neck=dict(
         type='HybridEncoder',
-        in_channels=[128, 256, 512],
+        in_channels=[128, 256, 256],
         deepen_factor=deepen_factor,
         widen_factor=widen_factor,
         hidden_dim=256,
