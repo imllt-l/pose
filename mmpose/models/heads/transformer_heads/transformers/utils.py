@@ -2,6 +2,7 @@
 import math
 
 import torch
+import torch.nn as nn
 import torch.nn.functional as F
 from mmcv.cnn import Linear
 from mmengine.model import BaseModule, ModuleList
@@ -101,3 +102,15 @@ class PositionEmbeddingSineHW(BaseModule):
         pos = torch.cat((pos_y, pos_x), dim=3).permute(0, 3, 1, 2)
 
         return pos
+
+class MLP(BaseModule):
+    def __init__(self, in_dim, hidden_dim, out_dim, num_layers):
+        super().__init__()
+        self.num_layers = num_layers
+        h = [hidden_dim] * (num_layers - 1)
+        self.layers = nn.ModuleList(nn.Linear(n, k) for n, k in zip([in_dim] + h, h + [out_dim]))
+
+    def forward(self, x):
+        for i, layer in enumerate(self.layers):
+            x = nn.functional.relu(layer(x)) if i < self.num_layers - 1 else layer(x)
+        return x
