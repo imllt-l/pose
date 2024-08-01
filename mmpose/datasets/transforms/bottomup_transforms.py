@@ -789,7 +789,7 @@ class BottomupRandomCrop(BaseTransform):
                 results['keypoints_visible'] = results['keypoints_visible'][
                     valid_inds]
 
-            if results.get('segmentation', None) is not None:
+            if results.get('segmentation', None) and results['segmentation'] is [None]:
                 results['segmentation'] = results['segmentation'][
                     crop_y1:crop_y2, crop_x1:crop_x2]
 

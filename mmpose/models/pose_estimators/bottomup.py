@@ -66,6 +66,7 @@ class BottomupPoseEstimator(BasePoseEstimator):
         losses = dict()
 
         if self.with_head:
+            #print(self.head.loss(feats, data_samples, train_cfg=self.train_cfg))
             losses.update(
                 self.head.loss(feats, data_samples, train_cfg=self.train_cfg))
 

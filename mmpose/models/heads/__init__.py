@@ -9,6 +9,9 @@ from .regression_heads import (DSNTHead, IntegralRegressionHead,
                                TemporalRegressionHead,
                                TrajectoryRegressionHead)
 from .transformer_heads import EDPoseHead
+from .transformer_heads.RTDetr_Head import RTDETR
+from .transformer_heads.pose_head import GroupHead
+from .transformer_heads.rtpose_head import RTPoseHead
 
 __all__ = [
     'BaseHead', 'HeatmapHead', 'CPMHead', 'MSPNHead', 'ViPNASHead',
@@ -16,5 +19,5 @@ __all__ = [
     'DSNTHead', 'AssociativeEmbeddingHead', 'DEKRHead', 'VisPredictHead',
     'CIDHead', 'RTMCCHead', 'TemporalRegressionHead',
     'TrajectoryRegressionHead', 'MotionRegressionHead', 'EDPoseHead',
-    'InternetHead', 'RTMWHead', 'RTMOHead'
+    'InternetHead', 'RTMWHead', 'RTMOHead', 'GroupHead', 'RTDETR', 'RTPoseHead'
 ]

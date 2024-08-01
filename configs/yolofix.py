@@ -1,5 +1,4 @@
 _base_ = ['_base_/default_runtime.py']
-
 train_cfg = dict(
     _delete_=True,
     type='EpochBasedTrainLoop',

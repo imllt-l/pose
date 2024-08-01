@@ -143,6 +143,7 @@ class EDPoseDecoder(BaseModule):
         intermediate_reference_points = [reference_points]
         effect_num_dn = self.num_dn if self.training else 0
         inter_select_number = self.num_group
+
         for layer_id, layer in enumerate(self.layers):
             if reference_points.shape[-1] == 4:
                 reference_points_input = \
