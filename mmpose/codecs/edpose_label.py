@@ -1,5 +1,5 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-from typing import Optional
+from typing import Optional, List
 
 import numpy as np
 
@@ -33,12 +33,19 @@ class EDPoseLabel(BaseKeypointCodec):
         num_keypoints (int): The Number of keypoints
     """
 
-    auxiliary_encode_keys = {'area', 'bboxes', 'img_shape'}
+    auxiliary_encode_keys = {'area', 'img_shape', 'category_id'}
+    label_mapping_table = dict(
+        bbox='bboxes',
+        bbox_labels='labels',
+        keypoints='keypoints',
+        keypoints_visible='keypoints_visible',
+        area='areas',
+    )
     instance_mapping_table = dict(
         bbox='bboxes',
         keypoints='keypoints',
         keypoints_visible='keypoints_visible',
-        area='areas',
+        area='areas'
     )
 
     def __init__(self, num_select: int = 100, num_keypoints: int = 17):
@@ -48,12 +55,13 @@ class EDPoseLabel(BaseKeypointCodec):
         self.num_keypoints = num_keypoints
 
     def encode(
-        self,
-        img_shape,
-        keypoints: np.ndarray,
-        keypoints_visible: Optional[np.ndarray] = None,
-        area: Optional[np.ndarray] = None,
-        bboxes: Optional[np.ndarray] = None,
+            self,
+            img_shape,
+            keypoints: np.ndarray,
+            keypoints_visible: Optional[np.ndarray] = None,
+            area: Optional[np.ndarray] = None,
+            bboxes: Optional[np.ndarray] = None,
+            category_id: Optional[List[int]] = None
     ) -> dict:
         """Encoding keypoints, area and bbox from input image space to
         normalized space.
@@ -95,11 +103,17 @@ class EDPoseLabel(BaseKeypointCodec):
         if keypoints is not None:
             keypoints = keypoints / np.array([w, h], dtype=np.float32)
 
+        if category_id is not None:
+            # Convert category IDs to labels
+            category_id = np.array(category_id).astype(np.int8) - 1
+
         encoded = dict(
             keypoints=keypoints,
             area=area,
             bbox=bboxes,
-            keypoints_visible=keypoints_visible)
+            keypoints_visible=keypoints_visible,
+            bbox_labels=category_id
+        )
 
         return encoded
 

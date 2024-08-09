@@ -1,4 +1,5 @@
 # Copyright (c) OpenMMLab. All rights reserved.
+import pdb
 from itertools import zip_longest
 from typing import List, Optional, Union
 
@@ -64,9 +65,9 @@ class BottomupPoseEstimator(BasePoseEstimator):
         feats = self.extract_feat(inputs)
 
         losses = dict()
-
+        #pdb.set_trace()
         if self.with_head:
-            #print(self.head.loss(feats, data_samples, train_cfg=self.train_cfg))
+            # print(self.head.loss(feats, data_samples, train_cfg=self.train_cfg))
             losses.update(
                 self.head.loss(feats, data_samples, train_cfg=self.train_cfg))
 
@@ -172,7 +173,7 @@ class BottomupPoseEstimator(BasePoseEstimator):
 
             # convert keypoint coordinates from input space to image space
             pred_instances.keypoints = pred_instances.keypoints / input_size \
-                * input_scale + input_center - 0.5 * input_scale
+                                       * input_scale + input_center - 0.5 * input_scale
             if 'keypoints_visible' not in pred_instances:
                 pred_instances.keypoints_visible = \
                     pred_instances.keypoint_scores
@@ -182,7 +183,7 @@ class BottomupPoseEstimator(BasePoseEstimator):
                 bboxes = pred_instances.bboxes.reshape(
                     pred_instances.bboxes.shape[0], 2, 2)
                 bboxes = bboxes / input_size * input_scale + input_center \
-                    - 0.5 * input_scale
+                         - 0.5 * input_scale
                 pred_instances.bboxes = bboxes.reshape(bboxes.shape[0], 4)
 
             data_sample.pred_instances = pred_instances

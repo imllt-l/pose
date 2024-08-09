@@ -15,11 +15,12 @@ class TestEDPoseLabel(TestCase):
         self.keypoints = np.array([[[100, 50], [200, 50]],
                                    [[300, 400], [100, 200]]])
         self.area = np.array([5000, 8000])
+        self.category_id = [1, 2]
 
     def test_encode(self):
         # Test encoding
         encoded_data = self.encoder.encode(
-            img_shape=self.img_shape, keypoints=self.keypoints, area=self.area)
+            img_shape=self.img_shape, keypoints=self.keypoints, area=self.area, category_id=self.category_id)
 
         self.assertEqual(encoded_data['keypoints'].shape, self.keypoints.shape)
         self.assertEqual(encoded_data['area'].shape, self.area.shape)
@@ -35,6 +36,7 @@ class TestEDPoseLabel(TestCase):
             self.img_shape[0] * self.img_shape[1])
         np.testing.assert_array_almost_equal(encoded_data['area'],
                                              expected_area)
+        np.array_equal(encoded_data['bbox_labels'], np.array([0, 1]))
 
     def test_decode(self):
         # Dummy predictions for logits, boxes, and keypoints

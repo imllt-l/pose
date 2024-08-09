@@ -108,7 +108,7 @@ model = dict(
             type='ChannelMapper',
             in_channels=[256, 256, 256],
             kernel_size=1,
-            out_channels=128,
+            out_channels=256,
             act_cfg=None,
             norm_cfg=dict(type='BN'),
             num_outs=3)
@@ -208,6 +208,7 @@ train_pipeline = [
                     keep_ratio=True)
             ]
         ]),
+    dict(type='GenerateTarget', encoder=codec),
     dict(type=PackPoseInputs),
 ]
 

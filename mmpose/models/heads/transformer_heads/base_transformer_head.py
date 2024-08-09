@@ -57,6 +57,7 @@ class TransformerHead(BaseHead):
     def forward(self,
                 feats: Tuple[Tensor],
                 batch_data_samples: OptSampleList = None) -> Dict:
+
         """Forward the network."""
         encoder_outputs_dict = self.forward_encoder(feats, batch_data_samples)
 
