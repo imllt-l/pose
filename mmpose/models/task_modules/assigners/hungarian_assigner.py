@@ -85,10 +85,9 @@ class PoseHungarianAssigner(BaseAssigner):
         Returns:
             :obj:`AssignResult`: The assigned result.
         """
-
-        assert isinstance(gt_instances.labels, Tensor)
+        # assert isinstance(gt_instances.labels, Tensor)
         num_gts, num_preds = len(gt_instances), len(pred_instances)
-        gt_labels = gt_instances.labels
+        gt_labels = torch.tensor(gt_instances.category_id).long()
         device = gt_labels.device
 
         # 1. assign -1 by default

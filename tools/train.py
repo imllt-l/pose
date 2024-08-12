@@ -1,6 +1,7 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import argparse
 import os
+os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"
 import os.path as osp
 from mmengine.hub import get_config
 from mmengine.config import Config, DictAction

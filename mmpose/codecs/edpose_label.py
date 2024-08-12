@@ -2,6 +2,7 @@
 from typing import Optional, List
 
 import numpy as np
+import torch
 
 from mmpose.registry import KEYPOINT_CODECS
 from mmpose.structures import bbox_cs2xyxy, bbox_xyxy2cs
@@ -33,19 +34,17 @@ class EDPoseLabel(BaseKeypointCodec):
         num_keypoints (int): The Number of keypoints
     """
 
-    auxiliary_encode_keys = {'area', 'img_shape', 'category_id'}
+    auxiliary_encode_keys = {'area', 'img_shape', 'category_id', 'bbox'}
     label_mapping_table = dict(
-        bbox='bboxes',
-        bbox_labels='labels',
+        labels='category_id',
+    )
+    instance_mapping_table = dict(
+        labels='category_id',
+        bbox='bbox',
+        bboxes='bbox',
         keypoints='keypoints',
         keypoints_visible='keypoints_visible',
         area='areas',
-    )
-    instance_mapping_table = dict(
-        bbox='bboxes',
-        keypoints='keypoints',
-        keypoints_visible='keypoints_visible',
-        area='areas'
     )
 
     def __init__(self, num_select: int = 100, num_keypoints: int = 17):
@@ -61,7 +60,8 @@ class EDPoseLabel(BaseKeypointCodec):
             keypoints_visible: Optional[np.ndarray] = None,
             area: Optional[np.ndarray] = None,
             bboxes: Optional[np.ndarray] = None,
-            category_id: Optional[List[int]] = None
+            bbox: Optional[np.ndarray] = None,
+            category_id: Optional[List[int]] = None,
     ) -> dict:
         """Encoding keypoints, area and bbox from input image space to
         normalized space.
@@ -93,12 +93,13 @@ class EDPoseLabel(BaseKeypointCodec):
         if keypoints_visible is None:
             keypoints_visible = np.ones(keypoints.shape[:2], dtype=np.float32)
 
-        if bboxes is not None:
-            bboxes = np.concatenate(bbox_xyxy2cs(bboxes), axis=-1)
-            bboxes = bboxes / np.array([w, h, w, h], dtype=np.float32)
+        if bboxes is None:
+            bbox = np.concatenate(bbox_xyxy2cs(bbox), axis=-1)
+            bbox = bbox / np.array([w, h, w, h], dtype=np.float32)
+            bbox = torch.from_numpy(bbox).float()
 
         if area is not None:
-            area = area / float(w * h)
+            area = area.astype(np.float32) / np.float32(w * h)
 
         if keypoints is not None:
             keypoints = keypoints / np.array([w, h], dtype=np.float32)
@@ -110,9 +111,9 @@ class EDPoseLabel(BaseKeypointCodec):
         encoded = dict(
             keypoints=keypoints,
             area=area,
-            bbox=bboxes,
+            bboxes=bbox,
             keypoints_visible=keypoints_visible,
-            bbox_labels=category_id
+            labels=category_id
         )
 
         return encoded

@@ -97,11 +97,12 @@ class BBoxL1Cost(BaseMatchCost):
         Returns:
             Tensor: Match Cost matrix of shape (num_preds, num_gts).
         """
-        pred_bboxes = pred_instances.bboxes
-        gt_bboxes = gt_instances.bboxes
+        pred_bboxes =  pred_instances.bboxes
+        gt_bboxes = gt_instances.bbox
 
         # convert box format
         if self.box_format == 'xywh':
+
             gt_bboxes = bbox_xyxy_to_cxcywh(gt_bboxes)
             pred_bboxes = bbox_xyxy_to_cxcywh(pred_bboxes)
 
@@ -162,7 +163,7 @@ class IoUCost(BaseMatchCost):
             Tensor: Match Cost matrix of shape (num_preds, num_gts).
         """
         pred_bboxes = pred_instances.bboxes
-        gt_bboxes = gt_instances.bboxes
+        gt_bboxes = gt_instances.bbox
 
         overlaps = bbox_overlaps(
             pred_bboxes, gt_bboxes, mode=self.iou_mode, is_aligned=False)
@@ -215,7 +216,7 @@ class ClassificationCost(BaseMatchCost):
             Tensor: Match Cost matrix of shape (num_preds, num_gts).
         """
         pred_scores = pred_instances.scores
-        gt_labels = gt_instances.labels
+        gt_labels = gt_instances.category_id
 
         pred_scores = pred_scores.softmax(-1)
         cls_cost = -pred_scores[:, gt_labels]
@@ -261,9 +262,9 @@ class FocalLossCost(BaseMatchCost):
         """
         cls_pred = cls_pred.sigmoid()
         neg_cost = -(1 - cls_pred + self.eps).log() * (
-            1 - self.alpha) * cls_pred.pow(self.gamma)
+                1 - self.alpha) * cls_pred.pow(self.gamma)
         pos_cost = -(cls_pred + self.eps).log() * self.alpha * (
-            1 - cls_pred).pow(self.gamma)
+                1 - cls_pred).pow(self.gamma)
 
         cls_cost = pos_cost[:, gt_labels] - neg_cost[:, gt_labels]
         return cls_cost * self.weight
@@ -285,12 +286,12 @@ class FocalLossCost(BaseMatchCost):
         n = cls_pred.shape[1]
         cls_pred = cls_pred.sigmoid()
         neg_cost = -(1 - cls_pred + self.eps).log() * (
-            1 - self.alpha) * cls_pred.pow(self.gamma)
+                1 - self.alpha) * cls_pred.pow(self.gamma)
         pos_cost = -(cls_pred + self.eps).log() * self.alpha * (
-            1 - cls_pred).pow(self.gamma)
+                1 - cls_pred).pow(self.gamma)
 
         cls_cost = torch.einsum('nc,mc->nm', pos_cost, gt_labels) + \
-            torch.einsum('nc,mc->nm', neg_cost, (1 - gt_labels))
+                   torch.einsum('nc,mc->nm', neg_cost, (1 - gt_labels))
         return cls_cost / n * self.weight
 
     def __call__(self,
@@ -362,10 +363,10 @@ class DiceCost(BaseMatchCost):
         numerator = 2 * torch.einsum('nc,mc->nm', mask_preds, gt_masks)
         if self.naive_dice:
             denominator = mask_preds.sum(-1)[:, None] + \
-                gt_masks.sum(-1)[None, :]
+                          gt_masks.sum(-1)[None, :]
         else:
             denominator = mask_preds.pow(2).sum(1)[:, None] + \
-                gt_masks.pow(2).sum(1)[None, :]
+                          gt_masks.pow(2).sum(1)[None, :]
         loss = 1 - (numerator + self.eps) / (denominator + self.eps)
         return loss
 
@@ -431,7 +432,7 @@ class CrossEntropyLossCost(BaseMatchCost):
         neg = F.binary_cross_entropy_with_logits(
             cls_pred, torch.zeros_like(cls_pred), reduction='none')
         cls_cost = torch.einsum('nc,mc->nm', pos, gt_labels) + \
-            torch.einsum('nc,mc->nm', neg, 1 - gt_labels)
+                   torch.einsum('nc,mc->nm', neg, 1 - gt_labels)
         cls_cost = cls_cost / n
 
         return cls_cost

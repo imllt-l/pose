@@ -65,7 +65,7 @@ class OutHead(BaseModule):
         self.num_pred_layer = num_pred_layer
         self.as_two_stage = as_two_stage
         self.cls_out_channels = num_classes
-
+        self.sync_cls_avg_factor = sync_cls_avg_factor
         super().__init__(*args, **kwargs)
         self._init_layers()
 
@@ -746,6 +746,116 @@ class RTPoseHead(TransformerHead):
         return (labels_list, label_weights_list, bbox_targets_list,
                 bbox_weights_list, num_total_pos, num_total_neg)
 
+    def get_dn_targets(self, batch_gt_instances: InstanceList,
+                       batch_img_metas: dict, dn_meta: Dict[str,
+            int]) -> tuple:
+        """Get targets in denoising part for a batch of images.
+
+        Args:
+            batch_gt_instances (list[:obj:`InstanceData`]): Batch of
+                gt_instance. It usually includes ``bboxes`` and ``labels``
+                attributes.
+            batch_img_metas (list[dict]): Meta information of each image, e.g.,
+                image size, scaling factor, etc.
+            dn_meta (Dict[str, int]): The dictionary saves information about
+              group collation, including 'num_denoising_queries' and
+              'num_denoising_groups'. It will be used for split outputs of
+              denoising and matching parts and loss calculation.
+
+        Returns:
+            tuple: a tuple containing the following targets.
+
+            - labels_list (list[Tensor]): Labels for all images.
+            - label_weights_list (list[Tensor]): Label weights for all images.
+            - bbox_targets_list (list[Tensor]): BBox targets for all images.
+            - bbox_weights_list (list[Tensor]): BBox weights for all images.
+            - num_total_pos (int): Number of positive samples in all images.
+            - num_total_neg (int): Number of negative samples in all images.
+        """
+        (labels_list, label_weights_list, bbox_targets_list, bbox_weights_list,
+         pos_inds_list, neg_inds_list) = multi_apply(
+            self._get_dn_targets_single,
+            batch_gt_instances,
+            batch_img_metas,
+            dn_meta=dn_meta)
+        num_total_pos = sum((inds.numel() for inds in pos_inds_list))
+        num_total_neg = sum((inds.numel() for inds in neg_inds_list))
+        return (labels_list, label_weights_list, bbox_targets_list,
+                bbox_weights_list, num_total_pos, num_total_neg)
+
+    def _get_dn_targets_single(self, gt_instances: InstanceData,
+                               img_meta: dict, dn_meta: Dict[str,
+            int]) -> tuple:
+        """Get targets in denoising part for one image.
+
+        Args:
+            gt_instances (:obj:`InstanceData`): Ground truth of instance
+                annotations. It should includes ``bboxes`` and ``labels``
+                attributes.
+            img_meta (dict): Meta information for one image.
+            dn_meta (Dict[str, int]): The dictionary saves information about
+              group collation, including 'num_denoising_queries' and
+              'num_denoising_groups'. It will be used for split outputs of
+              denoising and matching parts and loss calculation.
+
+        Returns:
+            tuple[Tensor]: a tuple containing the following for one image.
+
+            - labels (Tensor): Labels of each image.
+            - label_weights (Tensor]): Label weights of each image.
+            - bbox_targets (Tensor): BBox targets of each image.
+            - bbox_weights (Tensor): BBox weights of each image.
+            - pos_inds (Tensor): Sampled positive indices for each image.
+            - neg_inds (Tensor): Sampled negative indices for each image.
+        """
+        gt_bboxes = gt_instances.bbox
+        gt_labels = gt_instances.category_id
+        num_groups = dn_meta['num_denoising_groups']
+        num_denoising_queries = dn_meta['num_denoising_queries']
+        num_queries_each_group = int(num_denoising_queries / num_groups)
+        device = gt_bboxes.device
+        gt_labels = torch.tensor(gt_labels, dtype=torch.long, device=device)
+
+        if len(gt_labels) > 0:
+            t = torch.arange(len(gt_labels), dtype=torch.long, device=device)
+            t = t.unsqueeze(0).repeat(num_groups, 1)
+            pos_assigned_gt_inds = t.flatten()
+            pos_inds = torch.arange(
+                num_groups, dtype=torch.long, device=device)
+            pos_inds = pos_inds.unsqueeze(1) * num_queries_each_group + t
+            pos_inds = pos_inds.flatten()
+        else:
+            pos_inds = pos_assigned_gt_inds = \
+                gt_bboxes.new_tensor([], dtype=torch.long)
+
+        neg_inds = pos_inds + num_queries_each_group // 2
+
+        # label targets
+        labels = gt_bboxes.new_full((num_denoising_queries,),
+                                    self.out_head.num_classes,
+                                    dtype=torch.long)
+
+        labels[pos_inds] = gt_labels[pos_assigned_gt_inds.cpu()]
+        label_weights = gt_bboxes.new_ones(num_denoising_queries)
+
+        # bbox targets
+        bbox_targets = torch.zeros(num_denoising_queries, 4, device=device)
+        bbox_weights = torch.zeros(num_denoising_queries, 4, device=device)
+        bbox_weights[pos_inds] = 1.0
+        img_h, img_w = img_meta['img_shape']
+
+        # DETR regress the relative position of boxes (cxcywh) in the image.
+        # Thus the learning target should be normalized by the image size, also
+        # the box format should be converted from defaultly x1y1x2y2 to cxcywh.
+        factor = gt_bboxes.new_tensor([img_w, img_h, img_w,
+                                       img_h]).unsqueeze(0)
+        gt_bboxes_normalized = gt_bboxes / factor
+        gt_bboxes_targets = bbox_xyxy_to_cxcywh(gt_bboxes_normalized)
+        bbox_targets[pos_inds] = gt_bboxes_targets.repeat([num_groups, 1])
+
+        return (labels, label_weights, bbox_targets, bbox_weights, pos_inds,
+                neg_inds)
+
     def _get_targets_single(self, cls_score: Tensor, bbox_pred: Tensor,
                             gt_instances: InstanceData,
                             img_meta: dict) -> tuple:
@@ -789,8 +899,8 @@ class RTPoseHead(TransformerHead):
             gt_instances=gt_instances,
             img_meta=img_meta)
 
-        gt_bboxes = gt_instances.bboxes
-        gt_labels = gt_instances.labels
+        gt_bboxes = gt_instances.bbox
+        gt_labels = gt_instances.category_id
         pos_inds = torch.nonzero(
             assign_result.gt_inds > 0, as_tuple=False).squeeze(-1).unique()
         neg_inds = torch.nonzero(
@@ -800,7 +910,7 @@ class RTPoseHead(TransformerHead):
 
         # label targets
         labels = gt_bboxes.new_full((num_bboxes,),
-                                    self.num_classes,
+                                    self.out_head.num_classes,
                                     dtype=torch.long)
         labels[pos_inds] = gt_labels[pos_assigned_gt_inds]
         label_weights = gt_bboxes.new_ones(num_bboxes)
@@ -876,19 +986,19 @@ class RTPoseHead(TransformerHead):
             bboxes.detach(), bboxes_gt, is_aligned=True).clamp(min=1e-6)
 
         # classification loss
-        cls_scores = dn_cls_scores.reshape(-1, self.cls_out_channels)
+        cls_scores = dn_cls_scores.reshape(-1, self.out_head.cls_out_channels)
         cls_iou_targets = torch.zeros_like(cls_scores)
         if labels.numel() > 0:
             # valid indices of classification targets
-            valid_idx = labels < self.cls_out_channels
+            valid_idx = labels < self.out_head.cls_out_channels
             # assign iou score to the corresponding label
             cls_iou_targets[valid_idx,
             labels[valid_idx]] = iou_score[valid_idx]
 
         # construct weighted avg_factor to match with the official DETR repo
         cls_avg_factor = \
-            num_total_pos * 1.0 + num_total_neg * self.bg_cls_weight
-        if self.sync_cls_avg_factor:
+            num_total_pos * 1.0 + num_total_neg * 0.1 # self.bg_cls_weight
+        if self.out_head.sync_cls_avg_factor:
             cls_avg_factor = reduce_mean(
                 cls_scores.new_tensor([cls_avg_factor]))
         cls_avg_factor = max(cls_avg_factor, 1)
@@ -911,7 +1021,7 @@ class RTPoseHead(TransformerHead):
 
         # regression L1 loss
         loss_bbox = self.loss_bbox(
-            bbox_preds, bbox_targets, bbox_weights, avg_factor=num_total_pos)
+            bbox_preds, bbox_targets, bbox_weights)
         return loss_cls, loss_bbox, loss_iou
 
     def loss_by_feat_single(self, cls_scores: Tensor, bbox_preds: Tensor,
@@ -969,20 +1079,20 @@ class RTPoseHead(TransformerHead):
             bboxes.detach(), bboxes_gt, is_aligned=True).clamp(min=1e-6)
 
         # classification loss
-        cls_scores = cls_scores.reshape(-1, self.cls_out_channels)
+        cls_scores = cls_scores.reshape(-1, self.out_head.cls_out_channels)
         cls_iou_targets = torch.zeros_like(cls_scores)
         if labels.numel() > 0:
             # valid indices of classification targets
-            valid_idx = labels < self.cls_out_channels
+            valid_idx = labels < self.out_head.cls_out_channels
             # assign iou score to the corresponding label
             cls_iou_targets[valid_idx,
             labels[valid_idx]] = iou_score[valid_idx]
 
         # construct weighted avg_factor to match with the official DETR repo
         cls_avg_factor = num_total_pos * 1.0 + \
-                         num_total_neg * self.bg_cls_weight
+                         num_total_neg * 0.1
 
-        if self.sync_cls_avg_factor:
+        if self.out_head.sync_cls_avg_factor:
             cls_avg_factor = reduce_mean(
                 cls_scores.new_tensor([cls_avg_factor]))
         cls_avg_factor = max(cls_avg_factor, 1)
@@ -1001,7 +1111,7 @@ class RTPoseHead(TransformerHead):
 
         # regression L1 loss
         loss_bbox = self.loss_bbox(
-            bbox_preds, bbox_targets, bbox_weights, avg_factor=num_total_pos)
+            bbox_preds, bbox_targets, bbox_weights)
         return loss_cls, loss_bbox, loss_iou
 
     def loss_by_feat(
@@ -1144,8 +1254,6 @@ class RTPoseHead(TransformerHead):
             batch_img_metas.append(data_sample.metainfo)
             batch_gt_instances.append(data_sample.gt_instances)
             batch_gt_instances.append(data_sample.gt_instance_labels)
-            print(data_sample.gt_instances)
-            print(data_sample.gt_instance_labels)
 
         outs = self.forward(feats, batch_data_samples)
         # loss_inputs = outs+ (batch_gt_instances, batch_img_metas)
