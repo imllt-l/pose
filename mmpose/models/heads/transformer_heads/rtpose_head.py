@@ -907,7 +907,7 @@ class RTPoseHead(TransformerHead):
             assign_result.gt_inds == 0, as_tuple=False).squeeze(-1).unique()
         pos_assigned_gt_inds = assign_result.gt_inds[pos_inds] - 1
         pos_gt_bboxes = gt_bboxes[pos_assigned_gt_inds.long(), :]
-
+        pos_assigned_gt_inds = torch.tensor(pos_assigned_gt_inds, dtype=torch.long)
         # label targets
         labels = gt_bboxes.new_full((num_bboxes,),
                                     self.out_head.num_classes,
