@@ -705,6 +705,7 @@ class RTPoseHead(TransformerHead):
                 all_layers_denoising_cls_scores,
                 all_layers_denoising_bbox_preds)
 
+    @torch.no_grad()
     def get_targets(self, cls_scores_list: List[Tensor],
                     bbox_preds_list: List[Tensor],
                     batch_gt_instances: InstanceList,
@@ -745,7 +746,8 @@ class RTPoseHead(TransformerHead):
         num_total_neg = sum((inds.numel() for inds in neg_inds_list))
         return (labels_list, label_weights_list, bbox_targets_list,
                 bbox_weights_list, num_total_pos, num_total_neg)
-
+    
+    @torch.no_grad()
     def get_dn_targets(self, batch_gt_instances: InstanceList,
                        batch_img_metas: dict, dn_meta: Dict[str,
             int]) -> tuple:
@@ -783,6 +785,7 @@ class RTPoseHead(TransformerHead):
         return (labels_list, label_weights_list, bbox_targets_list,
                 bbox_weights_list, num_total_pos, num_total_neg)
 
+    @torch.no_grad()
     def _get_dn_targets_single(self, gt_instances: InstanceData,
                                img_meta: dict, dn_meta: Dict[str,
             int]) -> tuple:
@@ -855,7 +858,8 @@ class RTPoseHead(TransformerHead):
 
         return (labels, label_weights, bbox_targets, bbox_weights, pos_inds,
                 neg_inds)
-
+    
+    @torch.no_grad()
     def _get_targets_single(self, cls_score: Tensor, bbox_pred: Tensor,
                             gt_instances: InstanceData,
                             img_meta: dict) -> tuple:
@@ -888,6 +892,18 @@ class RTPoseHead(TransformerHead):
         factor = bbox_pred.new_tensor([img_w, img_h, img_w,
                                        img_h]).unsqueeze(0)
         num_bboxes = bbox_pred.size(0)
+        num_gts = len(gt_instances)
+
+        if num_gts == 0:
+            labels = bbox_pred.new_full((num_bboxes,), self.out_head.num_classes, dtype=torch.long)
+            label_weights = bbox_pred.new_ones(num_bboxes)
+            bbox_targets = torch.zeros_like(bbox_pred)
+            bbox_weights = torch.zeros_like(bbox_pred)
+            pos_inds = torch.tensor([], dtype=torch.long, device=bbox_pred.device)
+            neg_inds = torch.arange(num_bboxes, dtype=torch.long, device=bbox_pred.device)
+            print("num_gts == 0")
+            return (labels, label_weights, bbox_targets, bbox_weights, pos_inds, neg_inds)
+
         # convert bbox_pred from xywh, normalized to xyxy, unnormalized
         bbox_pred = bbox_cxcywh_to_xyxy(bbox_pred)
         bbox_pred = bbox_pred * factor
